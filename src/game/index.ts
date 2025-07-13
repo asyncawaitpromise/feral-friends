@@ -25,3 +25,12 @@ export type { MapRenderConfig, RenderLayer, WeatherEffect, WeatherParticle } fro
 
 export { MapManager, createMapManager } from './MapManager';
 export type { MapManagerConfig, LoadedMap, MapTransitionContext, TransitionEffect, MapLoadingState } from './MapManager';
+
+export { default as MapObjects, createMapObject as createEnvironmentObject, getObjectsInRadius, getObjectAtPosition, getInteractableObjectsNear, canInteractWithObject, getObjectsForBiome, OBJECT_TEMPLATES } from './MapObjects';
+export type { MapObject as EnvironmentObject, ObjectType, InteractionType, ObjectInteractionResult } from './MapObjects';
+
+export { default as InteractionManager, createInteractionManager, isInInteractionRange, getPrimaryInteraction } from './Interaction';
+export type { InteractionState, InteractionPrompt as IInteractionPrompt, InteractionContext } from './Interaction';
+
+export { default as EnvironmentRenderer } from './EnvironmentRenderer';
+export type { RenderContext, ShadowConfig, LightingConfig } from './EnvironmentRenderer';
