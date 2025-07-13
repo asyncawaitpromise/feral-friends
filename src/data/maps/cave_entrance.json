@@ -1,0 +1,237 @@
+{
+  "metadata": {
+    "id": "cave_entrance",
+    "name": "Cave Entrance",
+    "displayName": "Mysterious Cavern",
+    "description": "The mouth of a dark cave system. Strange sounds echo from within, and unusual animals seek shelter here.",
+    "biome": "cave",
+    "difficulty": "normal",
+    "recommendedLevel": 4,
+    "size": {
+      "width": 12,
+      "height": 16
+    },
+    "spawnPoint": {
+      "x": 5,
+      "y": 15
+    },
+    "bounds": {
+      "minX": 0,
+      "maxX": 11,
+      "minY": 0,
+      "maxY": 15
+    },
+    "weather": {
+      "default": "none",
+      "variations": ["none"]
+    },
+    "ambientSound": "cave_drips",
+    "backgroundMusic": "mysterious_depths",
+    "version": "1.0.0",
+    "created": "2024-01-01T00:00:00Z",
+    "lastModified": "2024-01-01T00:00:00Z"
+  },
+  "tiles": [
+    ["rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock", "rock"],
+    ["rock", "rock", "rock", "rock", "stone", "stone", "stone", "stone", "rock", "rock", "rock", "rock"],
+    ["rock", "rock", "rock", "stone", "stone", "dirt", "dirt", "stone", "stone", "rock", "rock", "rock"],
+    ["rock", "rock", "stone", "stone", "dirt", "dirt", "dirt", "dirt", "stone", "stone", "rock", "rock"],
+    ["rock", "stone", "stone", "dirt", "dirt", "dirt", "dirt", "dirt", "dirt", "stone", "stone", "rock"],
+    ["rock", "stone", "dirt", "dirt", "dirt", "dirt", "dirt", "dirt", "dirt", "dirt", "stone", "rock"],
+    ["rock", "stone", "dirt", "dirt", "dirt", "dirt", "dirt", "dirt", "dirt", "dirt", "stone", "rock"],
+    ["rock", "stone", "dirt", "dirt", "dirt", "dirt", "dirt", "dirt", "dirt", "dirt", "stone", "rock"],
+    ["rock", "stone", "dirt", "dirt", "dirt", "dirt", "dirt", "dirt", "dirt", "dirt", "stone", "rock"],
+    ["rock", "stone", "dirt", "dirt", "dirt", "water", "water", "dirt", "dirt", "dirt", "stone", "rock"],
+    ["rock", "stone", "dirt", "dirt", "dirt", "water", "water", "dirt", "dirt", "dirt", "stone", "rock"],
+    ["rock", "stone", "dirt", "dirt", "dirt", "dirt", "dirt", "dirt", "dirt", "dirt", "stone", "rock"],
+    ["rock", "stone", "stone", "dirt", "dirt", "dirt", "dirt", "dirt", "dirt", "stone", "stone", "rock"],
+    ["rock", "rock", "stone", "stone", "dirt", "dirt", "dirt", "dirt", "stone", "stone", "rock", "rock"],
+    ["rock", "rock", "rock", "stone", "stone", "path", "path", "stone", "stone", "rock", "rock", "rock"],
+    ["rock", "rock", "rock", "rock", "rock", "path", "path", "rock", "rock", "rock", "rock", "rock"]
+  ],
+  "objects": [
+    {
+      "id": "cave_pool",
+      "type": "water_source",
+      "position": { "x": 5, "y": 9 },
+      "size": { "width": 2, "height": 2 },
+      "walkable": false,
+      "interactable": true,
+      "metadata": {
+        "waterType": "underground",
+        "drinkable": true,
+        "magical": true,
+        "description": "A clear underground pool fed by mineral springs."
+      }
+    },
+    {
+      "id": "stalactite_01",
+      "type": "decoration",
+      "position": { "x": 3, "y": 5 },
+      "size": { "width": 1, "height": 1 },
+      "walkable": false,
+      "interactable": true,
+      "metadata": {
+        "decorationType": "stalactite",
+        "description": "Ancient rock formation hanging from the cave ceiling."
+      }
+    },
+    {
+      "id": "stalactite_02",
+      "type": "decoration",
+      "position": { "x": 8, "y": 7 },
+      "size": { "width": 1, "height": 1 },
+      "walkable": false,
+      "interactable": true,
+      "metadata": {
+        "decorationType": "stalactite",
+        "description": "Another impressive stalactite formation."
+      }
+    },
+    {
+      "id": "crystal_formation",
+      "type": "decoration",
+      "position": { "x": 2, "y": 8 },
+      "size": { "width": 1, "height": 1 },
+      "walkable": true,
+      "interactable": true,
+      "metadata": {
+        "decorationType": "crystals",
+        "magical": true,
+        "glowing": true,
+        "description": "Mysterious crystals that emit a soft, blue glow."
+      }
+    },
+    {
+      "id": "ancient_paintings",
+      "type": "landmark",
+      "position": { "x": 9, "y": 6 },
+      "size": { "width": 1, "height": 1 },
+      "walkable": true,
+      "interactable": true,
+      "metadata": {
+        "landmarkType": "cave_art",
+        "historical": true,
+        "description": "Ancient paintings on the cave wall depicting animals."
+      }
+    },
+    {
+      "id": "mushroom_cluster",
+      "type": "decoration",
+      "position": { "x": 4, "y": 11 },
+      "size": { "width": 1, "height": 1 },
+      "walkable": true,
+      "interactable": true,
+      "metadata": {
+        "decorationType": "cave_mushrooms",
+        "edible": false,
+        "glowing": true,
+        "description": "Bioluminescent mushrooms providing natural cave lighting."
+      }
+    }
+  ],
+  "transitions": [
+    {
+      "id": "to_forest_area",
+      "fromPosition": { "x": 5, "y": 15 },
+      "toMapId": "forest_area",
+      "toPosition": { "x": 12, "y": 1 },
+      "transitionType": "portal",
+      "description": "Exit the cave back to the forest."
+    },
+    {
+      "id": "to_deep_caves",
+      "fromPosition": { "x": 5, "y": 0 },
+      "toMapId": "deep_caves",
+      "toPosition": { "x": 8, "y": 15 },
+      "transitionType": "stairs",
+      "requirements": {
+        "level": 6,
+        "items": ["torch"]
+      },
+      "description": "Descend deeper into the cave system (requires light source)."
+    }
+  ],
+  "spawners": [
+    {
+      "id": "bat_spawner_01",
+      "animalTypes": ["bat", "cave_bat"],
+      "spawnRate": 3.0,
+      "maxAnimals": 8,
+      "spawnRadius": 3,
+      "conditions": {
+        "timeOfDay": "night"
+      }
+    },
+    {
+      "id": "salamander_spawner",
+      "animalTypes": ["cave_salamander"],
+      "spawnRate": 1.0,
+      "maxAnimals": 3,
+      "spawnRadius": 2,
+      "conditions": {}
+    },
+    {
+      "id": "spider_spawner",
+      "animalTypes": ["cave_spider"],
+      "spawnRate": 2.0,
+      "maxAnimals": 5,
+      "spawnRadius": 4,
+      "conditions": {}
+    },
+    {
+      "id": "crystal_creatures",
+      "animalTypes": ["crystal_moth"],
+      "spawnRate": 0.5,
+      "maxAnimals": 2,
+      "spawnRadius": 2,
+      "conditions": {}
+    }
+  ],
+  "regions": [
+    {
+      "id": "cave_entrance_area",
+      "name": "Cave Entrance",
+      "bounds": { "minX": 0, "maxX": 11, "minY": 12, "maxY": 15 },
+      "type": "safe",
+      "description": "The entrance area with natural light.",
+      "effects": {
+        "playerSpeedModifier": 1.0
+      }
+    },
+    {
+      "id": "main_cavern",
+      "name": "Main Cavern",
+      "bounds": { "minX": 1, "maxX": 10, "minY": 3, "maxY": 12 },
+      "type": "active",
+      "description": "The main cave chamber with various cave dwellers.",
+      "effects": {
+        "playerSpeedModifier": 0.9,
+        "animalBehaviorModifier": "cautious",
+        "soundscape": "cave_echoes"
+      }
+    },
+    {
+      "id": "crystal_area",
+      "name": "Crystal Formation",
+      "bounds": { "minX": 1, "maxX": 4, "minY": 6, "maxY": 10 },
+      "type": "special",
+      "description": "Area around the glowing crystals with magical properties.",
+      "effects": {
+        "animalBehaviorModifier": "mystical",
+        "soundscape": "crystal_hum"
+      }
+    },
+    {
+      "id": "underground_pool",
+      "name": "Underground Pool",
+      "bounds": { "minX": 4, "maxX": 7, "minY": 8, "maxY": 11 },
+      "type": "peaceful",
+      "description": "The area around the mineral spring pool.",
+      "effects": {
+        "animalBehaviorModifier": "trusting",
+        "soundscape": "water_drips"
+      }
+    }
+  ]
+}

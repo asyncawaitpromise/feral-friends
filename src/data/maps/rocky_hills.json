@@ -1,0 +1,250 @@
+{
+  "metadata": {
+    "id": "rocky_hills",
+    "name": "Rocky Hills",
+    "displayName": "Windswept Peaks",
+    "description": "Rugged hills covered with stones and sparse vegetation. Hardy mountain animals make their homes among the rocks and crags.",
+    "biome": "alpine",
+    "difficulty": "hard",
+    "recommendedLevel": 5,
+    "size": {
+      "width": 20,
+      "height": 15
+    },
+    "spawnPoint": {
+      "x": 1,
+      "y": 8
+    },
+    "bounds": {
+      "minX": 0,
+      "maxX": 19,
+      "minY": 0,
+      "maxY": 14
+    },
+    "weather": {
+      "default": "cloudy",
+      "variations": ["cloudy", "windy", "rainy", "foggy"]
+    },
+    "ambientSound": "mountain_wind",
+    "backgroundMusic": "rugged_terrain",
+    "version": "1.0.0",
+    "created": "2024-01-01T00:00:00Z",
+    "lastModified": "2024-01-01T00:00:00Z"
+  },
+  "tiles": [
+    ["rock", "rock", "rock", "rock", "rock", "stone", "stone", "stone", "stone", "stone", "stone", "stone", "stone", "stone", "stone", "rock", "rock", "rock", "rock", "rock"],
+    ["rock", "rock", "rock", "stone", "stone", "stone", "dirt", "dirt", "dirt", "dirt", "dirt", "dirt", "dirt", "stone", "stone", "stone", "rock", "rock", "rock", "rock"],
+    ["rock", "rock", "stone", "stone", "dirt", "dirt", "dirt", "grass", "grass", "grass", "grass", "grass", "dirt", "dirt", "stone", "stone", "stone", "rock", "rock", "rock"],
+    ["rock", "stone", "stone", "dirt", "dirt", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "dirt", "dirt", "stone", "stone", "stone", "rock", "rock"],
+    ["stone", "stone", "dirt", "dirt", "grass", "grass", "grass", "grass", "path", "path", "grass", "grass", "grass", "grass", "dirt", "dirt", "stone", "stone", "stone", "rock"],
+    ["stone", "dirt", "dirt", "grass", "grass", "grass", "grass", "path", "path", "path", "path", "grass", "grass", "grass", "grass", "dirt", "dirt", "stone", "stone", "stone"],
+    ["dirt", "dirt", "grass", "grass", "grass", "grass", "path", "path", "path", "path", "path", "path", "grass", "grass", "grass", "grass", "dirt", "dirt", "stone", "stone"],
+    ["dirt", "grass", "grass", "grass", "grass", "path", "path", "path", "path", "path", "path", "path", "path", "grass", "grass", "grass", "grass", "dirt", "dirt", "stone"],
+    ["path", "path", "path", "path", "path", "path", "path", "path", "path", "path", "path", "path", "path", "path", "path", "path", "path", "path", "dirt", "dirt"],
+    ["dirt", "grass", "grass", "grass", "grass", "path", "path", "path", "path", "path", "path", "path", "path", "grass", "grass", "grass", "grass", "dirt", "dirt", "stone"],
+    ["dirt", "dirt", "grass", "grass", "grass", "grass", "path", "path", "path", "path", "path", "path", "grass", "grass", "grass", "grass", "dirt", "dirt", "stone", "stone"],
+    ["stone", "dirt", "dirt", "grass", "grass", "grass", "grass", "path", "path", "path", "path", "grass", "grass", "grass", "grass", "dirt", "dirt", "stone", "stone", "stone"],
+    ["stone", "stone", "dirt", "dirt", "grass", "grass", "grass", "grass", "path", "path", "grass", "grass", "grass", "grass", "dirt", "dirt", "stone", "stone", "stone", "rock"],
+    ["rock", "stone", "stone", "dirt", "dirt", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "dirt", "dirt", "stone", "stone", "stone", "rock", "rock"],
+    ["rock", "rock", "stone", "stone", "dirt", "dirt", "dirt", "grass", "grass", "grass", "grass", "grass", "dirt", "dirt", "stone", "stone", "stone", "rock", "rock", "rock"]
+  ],
+  "objects": [
+    {
+      "id": "mountain_peak",
+      "type": "landmark",
+      "position": { "x": 9, "y": 2 },
+      "size": { "width": 2, "height": 2 },
+      "walkable": false,
+      "interactable": true,
+      "metadata": {
+        "landmarkType": "peak",
+        "elevation": 1200,
+        "description": "The highest point in the area, offering a commanding view."
+      }
+    },
+    {
+      "id": "boulder_field_01",
+      "type": "rock",
+      "position": { "x": 3, "y": 5 },
+      "size": { "width": 2, "height": 2 },
+      "walkable": false,
+      "interactable": true,
+      "metadata": {
+        "rockType": "granite_boulder",
+        "climbable": true,
+        "description": "Large granite boulders perfect for climbing practice."
+      }
+    },
+    {
+      "id": "boulder_field_02",
+      "type": "rock",
+      "position": { "x": 15, "y": 7 },
+      "size": { "width": 2, "height": 2 },
+      "walkable": false,
+      "interactable": true,
+      "metadata": {
+        "rockType": "granite_boulder",
+        "climbable": true,
+        "description": "More climbing boulders scattered across the hills."
+      }
+    },
+    {
+      "id": "mountain_cave_entrance",
+      "type": "decoration",
+      "position": { "x": 18, "y": 1 },
+      "size": { "width": 1, "height": 1 },
+      "walkable": true,
+      "interactable": true,
+      "metadata": {
+        "decorationType": "cave_entrance",
+        "leads_to": "mountain_cave",
+        "description": "A dark cave entrance carved into the mountainside."
+      }
+    },
+    {
+      "id": "hardy_pine",
+      "type": "tree",
+      "position": { "x": 6, "y": 10 },
+      "size": { "width": 1, "height": 1 },
+      "walkable": false,
+      "interactable": true,
+      "metadata": {
+        "species": "mountain_pine",
+        "description": "A resilient pine tree growing in the harsh mountain conditions."
+      }
+    },
+    {
+      "id": "stone_cairn",
+      "type": "landmark",
+      "position": { "x": 12, "y": 6 },
+      "size": { "width": 1, "height": 1 },
+      "walkable": true,
+      "interactable": true,
+      "metadata": {
+        "landmarkType": "cairn",
+        "description": "A stack of stones marking an important trail junction."
+      }
+    }
+  ],
+  "transitions": [
+    {
+      "id": "to_forest_area",
+      "fromPosition": { "x": 0, "y": 8 },
+      "toMapId": "forest_area",
+      "toPosition": { "x": 23, "y": 10 },
+      "transitionType": "edge",
+      "description": "Descend back into the forest."
+    },
+    {
+      "id": "to_mountain_cave",
+      "fromPosition": { "x": 18, "y": 1 },
+      "toMapId": "mountain_cave",
+      "toPosition": { "x": 2, "y": 8 },
+      "transitionType": "door",
+      "requirements": {
+        "level": 8
+      },
+      "description": "Enter the mysterious mountain cave."
+    },
+    {
+      "id": "to_high_peaks",
+      "fromPosition": { "x": 10, "y": 0 },
+      "toMapId": "high_peaks",
+      "toPosition": { "x": 10, "y": 14 },
+      "transitionType": "stairs",
+      "requirements": {
+        "level": 10,
+        "achievements": ["mountain_climber"]
+      },
+      "description": "Climb to the highest peaks (requires climbing experience)."
+    }
+  ],
+  "spawners": [
+    {
+      "id": "mountain_goat_spawner",
+      "animalTypes": ["mountain_goat"],
+      "spawnRate": 0.8,
+      "maxAnimals": 2,
+      "spawnRadius": 6,
+      "conditions": {
+        "timeOfDay": "day"
+      }
+    },
+    {
+      "id": "eagle_spawner",
+      "animalTypes": ["golden_eagle", "hawk"],
+      "spawnRate": 0.3,
+      "maxAnimals": 1,
+      "spawnRadius": 10,
+      "conditions": {
+        "timeOfDay": "day",
+        "weather": "sunny"
+      }
+    },
+    {
+      "id": "marmot_spawner",
+      "animalTypes": ["marmot", "pika"],
+      "spawnRate": 1.5,
+      "maxAnimals": 3,
+      "spawnRadius": 4,
+      "conditions": {
+        "timeOfDay": "day"
+      }
+    },
+    {
+      "id": "mountain_cat_spawner",
+      "animalTypes": ["lynx", "mountain_cat"],
+      "spawnRate": 0.2,
+      "maxAnimals": 1,
+      "spawnRadius": 8,
+      "conditions": {
+        "timeOfDay": "dusk"
+      }
+    }
+  ],
+  "regions": [
+    {
+      "id": "high_altitude",
+      "name": "High Altitude Zone",
+      "bounds": { "minX": 0, "maxX": 19, "minY": 0, "maxY": 14 },
+      "type": "dangerous",
+      "description": "The entire rocky hills area with thin air and challenging terrain.",
+      "effects": {
+        "playerSpeedModifier": 0.8,
+        "animalBehaviorModifier": "wary"
+      }
+    },
+    {
+      "id": "boulder_fields",
+      "name": "Boulder Fields",
+      "bounds": { "minX": 2, "maxX": 17, "minY": 4, "maxY": 10 },
+      "type": "active",
+      "description": "Areas with large boulders where climbing animals gather.",
+      "effects": {
+        "animalBehaviorModifier": "agile",
+        "soundscape": "wind_rocks"
+      }
+    },
+    {
+      "id": "mountain_pass",
+      "name": "Mountain Pass",
+      "bounds": { "minX": 5, "maxX": 15, "minY": 6, "maxY": 10 },
+      "type": "safe",
+      "description": "The main trail through the rocky hills.",
+      "effects": {
+        "playerSpeedModifier": 1.2
+      }
+    },
+    {
+      "id": "peak_area",
+      "name": "Peak Area",
+      "bounds": { "minX": 8, "maxX": 12, "minY": 1, "maxY": 5 },
+      "type": "special",
+      "description": "The highest elevations with rare mountain animals.",
+      "effects": {
+        "animalBehaviorModifier": "rare",
+        "soundscape": "high_wind"
+      }
+    }
+  ]
+}

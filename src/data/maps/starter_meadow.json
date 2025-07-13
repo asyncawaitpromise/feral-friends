@@ -1,0 +1,185 @@
+{
+  "metadata": {
+    "id": "starter_meadow",
+    "name": "Starter Meadow",
+    "displayName": "Peaceful Meadow",
+    "description": "A gentle grassy meadow perfect for beginning explorers. Small animals graze peacefully here, and the sound of a nearby stream creates a relaxing atmosphere.",
+    "biome": "temperate_grassland",
+    "difficulty": "easy",
+    "recommendedLevel": 1,
+    "size": {
+      "width": 20,
+      "height": 20
+    },
+    "spawnPoint": {
+      "x": 10,
+      "y": 10
+    },
+    "bounds": {
+      "minX": 0,
+      "maxX": 19,
+      "minY": 0,
+      "maxY": 19
+    },
+    "weather": {
+      "default": "sunny",
+      "variations": ["sunny", "cloudy", "light_rain"]
+    },
+    "ambientSound": "meadow_breeze",
+    "backgroundMusic": "peaceful_meadow",
+    "version": "1.0.0",
+    "created": "2024-01-01T00:00:00Z",
+    "lastModified": "2024-01-01T00:00:00Z"
+  },
+  "tiles": [
+    ["grass", "grass", "grass", "flower", "grass", "grass", "grass", "path", "grass", "grass", "grass", "path", "grass", "grass", "flower", "grass", "grass", "grass", "grass", "grass"],
+    ["grass", "flower", "grass", "grass", "grass", "bush", "grass", "path", "grass", "flower", "grass", "path", "grass", "grass", "grass", "grass", "bush", "grass", "grass", "grass"],
+    ["grass", "grass", "grass", "grass", "grass", "grass", "grass", "path", "grass", "grass", "grass", "path", "grass", "grass", "grass", "grass", "grass", "grass", "flower", "grass"],
+    ["flower", "grass", "grass", "bush", "grass", "grass", "grass", "path", "grass", "grass", "grass", "path", "grass", "flower", "grass", "grass", "grass", "grass", "grass", "grass"],
+    ["grass", "grass", "grass", "grass", "grass", "grass", "grass", "path", "path", "path", "path", "path", "grass", "grass", "grass", "bush", "grass", "grass", "grass", "flower"],
+    ["grass", "bush", "grass", "grass", "flower", "grass", "grass", "path", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass"],
+    ["grass", "grass", "grass", "grass", "grass", "grass", "grass", "path", "grass", "water", "water", "grass", "grass", "flower", "grass", "grass", "grass", "bush", "grass", "grass"],
+    ["path", "path", "path", "path", "path", "path", "path", "path", "grass", "water", "water", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass"],
+    ["grass", "grass", "grass", "grass", "grass", "grass", "grass", "path", "grass", "water", "water", "grass", "grass", "grass", "bush", "grass", "grass", "grass", "flower", "grass"],
+    ["grass", "flower", "grass", "grass", "bush", "grass", "grass", "path", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass"],
+    ["grass", "grass", "grass", "grass", "grass", "grass", "grass", "path", "grass", "grass", "grass", "grass", "flower", "grass", "grass", "grass", "bush", "grass", "grass", "grass"],
+    ["grass", "grass", "bush", "grass", "grass", "flower", "grass", "path", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "flower"],
+    ["flower", "grass", "grass", "grass", "grass", "grass", "grass", "path", "path", "path", "path", "path", "path", "path", "path", "path", "path", "path", "grass", "grass"],
+    ["grass", "grass", "grass", "bush", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "path", "grass", "grass"],
+    ["grass", "flower", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "flower", "grass", "grass", "bush", "grass", "grass", "grass", "grass", "path", "grass", "bush"],
+    ["grass", "grass", "grass", "grass", "bush", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "flower", "grass", "path", "grass", "grass"],
+    ["grass", "grass", "flower", "grass", "grass", "grass", "grass", "bush", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "path", "grass", "grass"],
+    ["bush", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "flower", "grass", "grass", "grass", "grass", "grass", "grass", "path", "flower", "grass"],
+    ["grass", "grass", "grass", "flower", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "bush", "grass", "grass", "grass", "path", "grass", "grass"],
+    ["grass", "flower", "grass", "grass", "grass", "bush", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "flower", "grass", "grass", "grass", "grass"]
+  ],
+  "objects": [
+    {
+      "id": "tree_01",
+      "type": "tree",
+      "position": { "x": 2, "y": 1 },
+      "size": { "width": 1, "height": 1 },
+      "walkable": false,
+      "interactable": true,
+      "metadata": {
+        "species": "oak",
+        "harvestable": false,
+        "description": "A sturdy oak tree providing shade for small animals."
+      }
+    },
+    {
+      "id": "tree_02",
+      "type": "tree",
+      "position": { "x": 15, "y": 3 },
+      "size": { "width": 1, "height": 1 },
+      "walkable": false,
+      "interactable": true,
+      "metadata": {
+        "species": "birch",
+        "harvestable": false,
+        "description": "A graceful birch tree with white bark."
+      }
+    },
+    {
+      "id": "rock_01",
+      "type": "rock",
+      "position": { "x": 5, "y": 8 },
+      "size": { "width": 1, "height": 1 },
+      "walkable": true,
+      "interactable": true,
+      "metadata": {
+        "rockType": "granite",
+        "description": "A smooth granite boulder, perfect for sitting."
+      }
+    },
+    {
+      "id": "pond_center",
+      "type": "water_source",
+      "position": { "x": 9, "y": 7 },
+      "size": { "width": 2, "height": 2 },
+      "walkable": false,
+      "interactable": true,
+      "metadata": {
+        "waterType": "fresh",
+        "fishable": true,
+        "drinkable": true,
+        "description": "A small, clear pond where animals come to drink."
+      }
+    }
+  ],
+  "transitions": [
+    {
+      "id": "to_forest_area",
+      "fromPosition": { "x": 19, "y": 12 },
+      "toMapId": "forest_area",
+      "toPosition": { "x": 1, "y": 10 },
+      "transitionType": "edge",
+      "description": "A path leading into the mysterious forest."
+    },
+    {
+      "id": "to_stream_area",
+      "fromPosition": { "x": 7, "y": 0 },
+      "toMapId": "stream_area", 
+      "toPosition": { "x": 7, "y": 19 },
+      "transitionType": "edge",
+      "description": "Follow the stream northward."
+    }
+  ],
+  "spawners": [
+    {
+      "id": "rabbit_spawner_01",
+      "animalTypes": ["rabbit", "bunny"],
+      "spawnRate": 2.0,
+      "maxAnimals": 3,
+      "spawnRadius": 3,
+      "conditions": {
+        "timeOfDay": "day",
+        "weather": "sunny"
+      }
+    },
+    {
+      "id": "bird_spawner_01", 
+      "animalTypes": ["robin", "sparrow"],
+      "spawnRate": 1.5,
+      "maxAnimals": 2,
+      "spawnRadius": 5,
+      "conditions": {
+        "timeOfDay": "dawn"
+      }
+    },
+    {
+      "id": "butterfly_spawner_01",
+      "animalTypes": ["butterfly"],
+      "spawnRate": 3.0,
+      "maxAnimals": 5,
+      "spawnRadius": 2,
+      "conditions": {
+        "weather": "sunny",
+        "season": "spring"
+      }
+    }
+  ],
+  "regions": [
+    {
+      "id": "pond_area",
+      "name": "Peaceful Pond",
+      "bounds": { "minX": 8, "maxX": 11, "minY": 6, "maxY": 9 },
+      "type": "peaceful",
+      "description": "The area around the pond is especially tranquil.",
+      "effects": {
+        "animalBehaviorModifier": "more_trusting",
+        "soundscape": "water_ambient"
+      }
+    },
+    {
+      "id": "flower_meadow",
+      "name": "Flower Meadow",
+      "bounds": { "minX": 0, "maxX": 19, "minY": 0, "maxY": 19 },
+      "type": "safe",
+      "description": "A safe area perfect for new explorers.",
+      "effects": {
+        "playerSpeedModifier": 1.0
+      }
+    }
+  ]
+}

@@ -1,0 +1,228 @@
+{
+  "metadata": {
+    "id": "stream_area",
+    "name": "Stream Area",
+    "displayName": "Babbling Brook",
+    "description": "A winding stream flows through this area, attracting water-loving animals. The sound of flowing water creates a peaceful atmosphere.",
+    "biome": "riparian",
+    "difficulty": "easy", 
+    "recommendedLevel": 2,
+    "size": {
+      "width": 15,
+      "height": 20
+    },
+    "spawnPoint": {
+      "x": 7,
+      "y": 18
+    },
+    "bounds": {
+      "minX": 0,
+      "maxX": 14,
+      "minY": 0,
+      "maxY": 19
+    },
+    "weather": {
+      "default": "cloudy",
+      "variations": ["sunny", "cloudy", "light_rain"]
+    },
+    "ambientSound": "flowing_water",
+    "backgroundMusic": "peaceful_stream",
+    "version": "1.0.0",
+    "created": "2024-01-01T00:00:00Z",
+    "lastModified": "2024-01-01T00:00:00Z"
+  },
+  "tiles": [
+    ["grass", "grass", "grass", "grass", "grass", "water", "water", "water", "grass", "grass", "grass", "grass", "grass", "grass", "grass"],
+    ["grass", "grass", "grass", "grass", "water", "water", "water", "water", "water", "grass", "grass", "grass", "grass", "grass", "grass"],
+    ["grass", "grass", "grass", "water", "water", "water", "water", "water", "water", "water", "grass", "grass", "grass", "grass", "grass"],
+    ["grass", "grass", "water", "water", "water", "water", "water", "water", "water", "water", "water", "grass", "grass", "grass", "grass"],
+    ["grass", "grass", "water", "water", "water", "water", "water", "water", "water", "water", "water", "grass", "grass", "grass", "grass"],
+    ["grass", "grass", "grass", "water", "water", "water", "water", "water", "water", "water", "grass", "grass", "grass", "grass", "grass"],
+    ["grass", "grass", "grass", "grass", "water", "water", "water", "water", "water", "grass", "grass", "grass", "grass", "grass", "grass"],
+    ["grass", "grass", "grass", "grass", "grass", "water", "water", "water", "grass", "grass", "grass", "grass", "grass", "grass", "grass"],
+    ["grass", "grass", "grass", "grass", "grass", "grass", "water", "water", "water", "grass", "grass", "grass", "grass", "grass", "grass"],
+    ["grass", "grass", "grass", "grass", "grass", "grass", "water", "water", "water", "grass", "grass", "grass", "grass", "grass", "grass"],
+    ["grass", "grass", "grass", "grass", "grass", "grass", "grass", "water", "water", "water", "grass", "grass", "grass", "grass", "grass"],
+    ["grass", "grass", "grass", "grass", "grass", "grass", "grass", "water", "water", "water", "grass", "grass", "grass", "grass", "grass"],
+    ["grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "water", "water", "water", "grass", "grass", "grass", "grass"],
+    ["grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "water", "water", "water", "grass", "grass", "grass", "grass"],
+    ["grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "water", "water", "water", "grass", "grass", "grass"],
+    ["grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "water", "water", "water", "grass", "grass", "grass"],
+    ["grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "water", "water", "water", "grass", "grass"],
+    ["grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "grass", "water", "water", "water", "grass", "grass"],
+    ["grass", "grass", "grass", "grass", "grass", "grass", "grass", "path", "path", "path", "path", "path", "path", "grass", "grass"],
+    ["grass", "grass", "grass", "grass", "grass", "grass", "grass", "path", "grass", "grass", "grass", "grass", "grass", "grass", "grass"]
+  ],
+  "objects": [
+    {
+      "id": "wooden_bridge",
+      "type": "decoration",
+      "position": { "x": 6, "y": 10 },
+      "size": { "width": 3, "height": 1 },
+      "walkable": true,
+      "interactable": false,
+      "metadata": {
+        "decorationType": "bridge",
+        "material": "wood",
+        "description": "A small wooden bridge crossing the stream."
+      }
+    },
+    {
+      "id": "waterfall_rocks",
+      "type": "rock",
+      "position": { "x": 4, "y": 2 },
+      "size": { "width": 2, "height": 2 },
+      "walkable": false,
+      "interactable": true,
+      "metadata": {
+        "rockType": "granite",
+        "special": "waterfall_source",
+        "description": "Large rocks where the stream cascades down."
+      }
+    },
+    {
+      "id": "beaver_dam",
+      "type": "decoration",
+      "position": { "x": 8, "y": 5 },
+      "size": { "width": 2, "height": 1 },
+      "walkable": false,
+      "interactable": true,
+      "metadata": {
+        "decorationType": "dam",
+        "animal_made": true,
+        "description": "A beaver dam that creates a small pool in the stream."
+      }
+    },
+    {
+      "id": "fishing_spot",
+      "type": "water_source",
+      "position": { "x": 7, "y": 8 },
+      "size": { "width": 2, "height": 2 },
+      "walkable": false,
+      "interactable": true,
+      "metadata": {
+        "waterType": "flowing",
+        "fishable": true,
+        "depth": "medium",
+        "description": "A deeper part of the stream perfect for fishing."
+      }
+    },
+    {
+      "id": "willow_tree",
+      "type": "tree",
+      "position": { "x": 1, "y": 8 },
+      "size": { "width": 1, "height": 1 },
+      "walkable": false,
+      "interactable": true,
+      "metadata": {
+        "species": "weeping_willow",
+        "description": "A graceful willow tree whose branches dip into the water."
+      }
+    }
+  ],
+  "transitions": [
+    {
+      "id": "to_starter_meadow",
+      "fromPosition": { "x": 7, "y": 19 },
+      "toMapId": "starter_meadow",
+      "toPosition": { "x": 7, "y": 1 },
+      "transitionType": "edge",
+      "description": "Return south to the meadow."
+    },
+    {
+      "id": "to_pond_area",
+      "fromPosition": { "x": 14, "y": 15 },
+      "toMapId": "pond_area",
+      "toPosition": { "x": 1, "y": 5 },
+      "transitionType": "edge",
+      "description": "Follow the stream to a larger pond."
+    }
+  ],
+  "spawners": [
+    {
+      "id": "frog_spawner_01",
+      "animalTypes": ["frog", "tree_frog"],
+      "spawnRate": 3.0,
+      "maxAnimals": 6,
+      "spawnRadius": 2,
+      "conditions": {
+        "weather": "light_rain"
+      }
+    },
+    {
+      "id": "duck_spawner_01",
+      "animalTypes": ["duck", "mallard"],
+      "spawnRate": 1.5,
+      "maxAnimals": 3,
+      "spawnRadius": 4,
+      "conditions": {
+        "timeOfDay": "day"
+      }
+    },
+    {
+      "id": "fish_spawner_01",
+      "animalTypes": ["trout", "minnow"],
+      "spawnRate": 2.0,
+      "maxAnimals": 8,
+      "spawnRadius": 1,
+      "conditions": {
+        "timeOfDay": "day"
+      }
+    },
+    {
+      "id": "beaver_spawner_01",
+      "animalTypes": ["beaver"],
+      "spawnRate": 0.5,
+      "maxAnimals": 2,
+      "spawnRadius": 5,
+      "conditions": {
+        "timeOfDay": "dusk"
+      }
+    },
+    {
+      "id": "dragonfly_spawner_01",
+      "animalTypes": ["dragonfly"],
+      "spawnRate": 4.0,
+      "maxAnimals": 10,
+      "spawnRadius": 2,
+      "conditions": {
+        "timeOfDay": "day",
+        "weather": "sunny"
+      }
+    }
+  ],
+  "regions": [
+    {
+      "id": "stream_flow",
+      "name": "Flowing Stream",
+      "bounds": { "minX": 3, "maxX": 12, "minY": 0, "maxY": 17 },
+      "type": "active",
+      "description": "The main stream where water animals are active.",
+      "effects": {
+        "animalBehaviorModifier": "playful",
+        "soundscape": "water_flowing"
+      }
+    },
+    {
+      "id": "stream_banks",
+      "name": "Stream Banks", 
+      "bounds": { "minX": 0, "maxX": 14, "minY": 0, "maxY": 19 },
+      "type": "peaceful",
+      "description": "The grassy areas along the stream.",
+      "effects": {
+        "playerSpeedModifier": 1.1,
+        "soundscape": "nature_peaceful"
+      }
+    },
+    {
+      "id": "beaver_territory",
+      "name": "Beaver Territory",
+      "bounds": { "minX": 6, "maxX": 10, "minY": 4, "maxY": 8 },
+      "type": "active",
+      "description": "Area around the beaver dam with increased beaver activity.",
+      "effects": {
+        "animalBehaviorModifier": "territorial"
+      }
+    }
+  ]
+}

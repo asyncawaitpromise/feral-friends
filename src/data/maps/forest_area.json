@@ -1,0 +1,218 @@
+{
+  "metadata": {
+    "id": "forest_area",
+    "name": "Forest Area",
+    "displayName": "Whispering Woods", 
+    "description": "A dense forest filled with towering trees and hidden paths. More challenging animals live here, and the shadows can be deceiving.",
+    "biome": "temperate_forest",
+    "difficulty": "normal",
+    "recommendedLevel": 3,
+    "size": {
+      "width": 25,
+      "height": 20
+    },
+    "spawnPoint": {
+      "x": 1,
+      "y": 10
+    },
+    "bounds": {
+      "minX": 0,
+      "maxX": 24,
+      "minY": 0,
+      "maxY": 19
+    },
+    "weather": {
+      "default": "cloudy",
+      "variations": ["cloudy", "light_rain", "foggy"]
+    },
+    "ambientSound": "forest_atmosphere",
+    "backgroundMusic": "mysterious_woods",
+    "version": "1.0.0",
+    "created": "2024-01-01T00:00:00Z",
+    "lastModified": "2024-01-01T00:00:00Z"
+  },
+  "tiles": [
+    ["forest", "forest", "forest", "forest", "forest", "path", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest"],
+    ["forest", "forest", "forest", "forest", "forest", "path", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest"],
+    ["forest", "forest", "forest", "forest", "forest", "path", "forest", "forest", "dirt", "dirt", "dirt", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest"],
+    ["forest", "forest", "forest", "forest", "forest", "path", "forest", "forest", "dirt", "dirt", "dirt", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest"],
+    ["forest", "forest", "forest", "forest", "forest", "path", "forest", "forest", "dirt", "dirt", "dirt", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest"],
+    ["forest", "forest", "forest", "forest", "forest", "path", "path", "path", "path", "path", "path", "path", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest"],
+    ["forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "path", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest"],
+    ["forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "path", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest"],
+    ["forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "path", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest"],
+    ["forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "path", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest"],
+    ["path", "path", "path", "path", "path", "path", "path", "path", "path", "path", "path", "path", "path", "path", "path", "path", "path", "path", "path", "path", "forest", "forest", "forest", "forest", "forest"],
+    ["forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "path", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest"],
+    ["forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "path", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest"],
+    ["forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "path", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest"],
+    ["forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "path", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest"],
+    ["forest", "forest", "forest", "forest", "forest", "path", "path", "path", "path", "path", "path", "path", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest"],
+    ["forest", "forest", "forest", "forest", "forest", "path", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest"],
+    ["forest", "forest", "forest", "forest", "forest", "path", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest"],
+    ["forest", "forest", "forest", "forest", "forest", "path", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest"],
+    ["forest", "forest", "forest", "forest", "forest", "path", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest", "forest"]
+  ],
+  "objects": [
+    {
+      "id": "ancient_tree",
+      "type": "tree",
+      "position": { "x": 12, "y": 5 },
+      "size": { "width": 2, "height": 2 },
+      "walkable": false,
+      "interactable": true,
+      "metadata": {
+        "species": "ancient_oak",
+        "age": 500,
+        "magical": true,
+        "description": "An enormous ancient oak tree that seems to whisper secrets."
+      }
+    },
+    {
+      "id": "hidden_clearing_center",
+      "type": "landmark",
+      "position": { "x": 9, "y": 3 },
+      "size": { "width": 1, "height": 1 },
+      "walkable": true,
+      "interactable": true,
+      "metadata": {
+        "landmarkType": "clearing",
+        "description": "A mysterious clearing where forest animals gather."
+      }
+    },
+    {
+      "id": "mushroom_ring_01",
+      "type": "decoration",
+      "position": { "x": 15, "y": 8 },
+      "size": { "width": 3, "height": 3 },
+      "walkable": true,
+      "interactable": true,
+      "metadata": {
+        "decorationType": "mushroom_ring",
+        "magical": true,
+        "description": "A ring of glowing mushrooms. Local folklore says they're portals."
+      }
+    },
+    {
+      "id": "fallen_log",
+      "type": "decoration",
+      "position": { "x": 6, "y": 13 },
+      "size": { "width": 3, "height": 1 },
+      "walkable": true,
+      "interactable": true,
+      "metadata": {
+        "decorationType": "fallen_tree",
+        "description": "A moss-covered log that small animals use as shelter."
+      }
+    }
+  ],
+  "transitions": [
+    {
+      "id": "to_starter_meadow",
+      "fromPosition": { "x": 0, "y": 10 },
+      "toMapId": "starter_meadow",
+      "toPosition": { "x": 18, "y": 12 },
+      "transitionType": "edge",
+      "description": "Return to the peaceful meadow."
+    },
+    {
+      "id": "to_rocky_hills",
+      "fromPosition": { "x": 24, "y": 10 },
+      "toMapId": "rocky_hills",
+      "toPosition": { "x": 1, "y": 8 },
+      "transitionType": "edge",
+      "requirements": {
+        "level": 5
+      },
+      "description": "A treacherous path leading to the rocky hills."
+    },
+    {
+      "id": "to_cave_entrance",
+      "fromPosition": { "x": 12, "y": 0 },
+      "toMapId": "cave_entrance",
+      "toPosition": { "x": 5, "y": 15 },
+      "transitionType": "portal",
+      "requirements": {
+        "items": ["forest_key"]
+      },
+      "description": "A hidden path revealed only to those with the forest key."
+    }
+  ],
+  "spawners": [
+    {
+      "id": "fox_spawner_01",
+      "animalTypes": ["fox", "red_fox"],
+      "spawnRate": 1.0,
+      "maxAnimals": 2,
+      "spawnRadius": 4,
+      "conditions": {
+        "timeOfDay": "dusk"
+      }
+    },
+    {
+      "id": "owl_spawner_01",
+      "animalTypes": ["owl", "forest_owl"],
+      "spawnRate": 0.5,
+      "maxAnimals": 1,
+      "spawnRadius": 6,
+      "conditions": {
+        "timeOfDay": "night"
+      }
+    },
+    {
+      "id": "squirrel_spawner_01",
+      "animalTypes": ["squirrel", "red_squirrel"],
+      "spawnRate": 2.5,
+      "maxAnimals": 4,
+      "spawnRadius": 3,
+      "conditions": {
+        "timeOfDay": "day"
+      }
+    },
+    {
+      "id": "deer_spawner_01",
+      "animalTypes": ["deer", "white_tailed_deer"],
+      "spawnRate": 0.3,
+      "maxAnimals": 1,
+      "spawnRadius": 8,
+      "conditions": {
+        "timeOfDay": "dawn",
+        "weather": "cloudy"
+      }
+    }
+  ],
+  "regions": [
+    {
+      "id": "hidden_clearing",
+      "name": "Hidden Clearing",
+      "bounds": { "minX": 8, "maxX": 11, "minY": 2, "maxY": 5 },
+      "type": "special",
+      "description": "A magical clearing where rare animals appear.",
+      "effects": {
+        "animalBehaviorModifier": "curious",
+        "soundscape": "magical_whispers"
+      }
+    },
+    {
+      "id": "deep_forest",
+      "name": "Deep Forest",
+      "bounds": { "minX": 0, "maxX": 24, "minY": 0, "maxY": 19 },
+      "type": "active",
+      "description": "The main forest area with normal animal activity.",
+      "effects": {
+        "playerSpeedModifier": 0.9
+      }
+    },
+    {
+      "id": "mushroom_grove",
+      "name": "Mushroom Grove", 
+      "bounds": { "minX": 14, "maxX": 18, "minY": 7, "maxY": 11 },
+      "type": "special",
+      "description": "An area rich with magical mushrooms.",
+      "effects": {
+        "animalBehaviorModifier": "magical",
+        "soundscape": "mystical_hum"
+      }
+    }
+  ]
+}
