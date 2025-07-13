@@ -1,2 +1,2 @@
 // State Management Barrel Exports
-export { useGameStore, useGameState, usePlayerState, useUIState, useSettings } from './gameStore';
+export { useGameStore, useGameState, usePlayerState, useAnimalState, useUIState, useSettings } from './gameStore';

@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { STORAGE_KEYS } from '../constants';
+import { Animal } from '../game/Animal';
+import { DialogueState } from '../game/DialogueSystem';
 
 // Types for game state
 interface Position {
@@ -37,12 +39,19 @@ interface PlayerState {
   isMoving: boolean;
 }
 
+interface AnimalState {
+  animals: Animal[];
+  spawnedCount: number;
+  lastSpawnTime: number;
+}
+
 interface UIState {
   activeModal: string | null;
   showDebugInfo: boolean;
   showGrid: boolean;
   activeMenu: string | null;
   notifications: Notification[];
+  dialogueState: DialogueState;
 }
 
 interface Settings {
@@ -69,6 +78,7 @@ interface GameStore {
   // Game State
   gameState: GameState;
   playerState: PlayerState;
+  animalState: AnimalState;
   uiState: UIState;
   settings: Settings;
   
@@ -92,6 +102,12 @@ interface GameStore {
   discoverAnimal: (animalId: string) => void;
   unlockAchievement: (achievementId: string) => void;
   
+  // Animal Actions
+  addAnimal: (animal: Animal) => void;
+  removeAnimal: (animalId: string) => void;
+  updateAnimal: (animalId: string, updates: Partial<Animal>) => void;
+  clearAllAnimals: () => void;
+  
   // UI Actions
   openModal: (modalId: string) => void;
   closeModal: () => void;
@@ -101,6 +117,10 @@ interface GameStore {
   toggleGrid: () => void;
   addNotification: (notification: Omit<Notification, 'id' | 'timestamp'>) => void;
   removeNotification: (notificationId: string) => void;
+  
+  // Dialogue Actions
+  setDialogueState: (state: DialogueState) => void;
+  clearDialogue: () => void;
   
   // Settings Actions
   updateSettings: (settings: Partial<Settings>) => void;
@@ -144,7 +164,20 @@ const defaultUIState: UIState = {
   showDebugInfo: true, // Show in development
   showGrid: true, // Show in development
   activeMenu: null,
-  notifications: []
+  notifications: [],
+  dialogueState: {
+    isActive: false,
+    currentAnimal: null,
+    currentTree: null,
+    currentOptions: [],
+    history: []
+  }
+};
+
+const defaultAnimalState: AnimalState = {
+  animals: [],
+  spawnedCount: 0,
+  lastSpawnTime: 0
 };
 
 const defaultSettings: Settings = {
@@ -188,6 +221,7 @@ export const useGameStore = create<GameStore>()(
         // Initial states
         gameState: defaultGameState,
         playerState: defaultPlayerState,
+        animalState: defaultAnimalState,
         uiState: defaultUIState,
         settings: defaultSettings,
 
@@ -389,6 +423,47 @@ export const useGameStore = create<GameStore>()(
           }));
         },
 
+        // Animal Actions
+        addAnimal: (animal: Animal) => {
+          set((state) => ({
+            animalState: {
+              ...state.animalState,
+              animals: [...state.animalState.animals, animal],
+              spawnedCount: state.animalState.spawnedCount + 1
+            }
+          }));
+        },
+
+        removeAnimal: (animalId: string) => {
+          set((state) => ({
+            animalState: {
+              ...state.animalState,
+              animals: state.animalState.animals.filter(animal => animal.id !== animalId)
+            }
+          }));
+        },
+
+        updateAnimal: (animalId: string, updates: Partial<Animal>) => {
+          set((state) => ({
+            animalState: {
+              ...state.animalState,
+              animals: state.animalState.animals.map(animal => 
+                animal.id === animalId ? { ...animal, ...updates } : animal
+              )
+            }
+          }));
+        },
+
+        clearAllAnimals: () => {
+          set((state) => ({
+            animalState: {
+              ...state.animalState,
+              animals: [],
+              spawnedCount: 0
+            }
+          }));
+        },
+
         // UI Actions
         openModal: (modalId: string) => {
           set((state) => ({
@@ -475,6 +550,31 @@ export const useGameStore = create<GameStore>()(
           }));
         },
 
+        // Dialogue Actions
+        setDialogueState: (dialogueState: DialogueState) => {
+          set((state) => ({
+            uiState: {
+              ...state.uiState,
+              dialogueState
+            }
+          }));
+        },
+
+        clearDialogue: () => {
+          set((state) => ({
+            uiState: {
+              ...state.uiState,
+              dialogueState: {
+                isActive: false,
+                currentAnimal: null,
+                currentTree: null,
+                currentOptions: [],
+                history: []
+              }
+            }
+          }));
+        },
+
         // Settings Actions
         updateSettings: (newSettings: Partial<Settings>) => {
           set((state) => ({
@@ -510,6 +610,7 @@ export const useGameStore = create<GameStore>()(
           set(() => ({
             gameState: defaultGameState,
             playerState: defaultPlayerState,
+            animalState: defaultAnimalState,
             uiState: { ...defaultUIState, showDebugInfo: true, showGrid: true }
           }));
         }
@@ -520,6 +621,7 @@ export const useGameStore = create<GameStore>()(
         partialize: (state) => ({
           gameState: state.gameState,
           playerState: state.playerState,
+          animalState: state.animalState,
           settings: state.settings
         })
       }
@@ -530,5 +632,6 @@ export const useGameStore = create<GameStore>()(
 // Convenient selectors
 export const useGameState = () => useGameStore((state) => state.gameState);
 export const usePlayerState = () => useGameStore((state) => state.playerState);
+export const useAnimalState = () => useGameStore((state) => state.animalState);
 export const useUIState = () => useGameStore((state) => state.uiState);
 export const useSettings = () => useGameStore((state) => state.settings);

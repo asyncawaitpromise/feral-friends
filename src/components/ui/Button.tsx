@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { animated } from '@react-spring/web';
 import { MOBILE_TOUCH_TARGET_SIZE } from '../../constants';
+import { useBounce, useFadeIn } from '../../hooks/useAnimation';
+import { getAudioManager } from '../../services/AudioManager';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
@@ -22,6 +25,12 @@ const Button: React.FC<ButtonProps> = ({
   className = '',
   ...props
 }) => {
+  const [isPressed, setIsPressed] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+
+  // Animation hooks
+  const bounceStyle = useBounce(isPressed, 1.05);
+  const fadeStyle = useFadeIn(true);
   const baseClasses = [
     'inline-flex items-center justify-center',
     'font-medium rounded-lg transition-all duration-200',
@@ -51,11 +60,38 @@ const Button: React.FC<ButtonProps> = ({
     minWidth: `${MOBILE_TOUCH_TARGET_SIZE}px`
   };
 
+  const handleMouseDown = () => {
+    setIsPressed(true);
+    getAudioManager().playButtonClick();
+  };
+  
+  const handleMouseUp = () => setIsPressed(false);
+  
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    getAudioManager().playButtonHover();
+  };
+  
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setIsPressed(false);
+  };
+
   return (
-    <button
+    <animated.button
       className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
-      style={touchTargetStyle}
+      style={{ 
+        ...touchTargetStyle, 
+        ...bounceStyle,
+        ...fadeStyle
+      }}
       disabled={disabled || isLoading}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onTouchStart={handleMouseDown}
+      onTouchEnd={handleMouseUp}
       {...props}
     >
       {isLoading && (
@@ -90,7 +126,7 @@ const Button: React.FC<ButtonProps> = ({
       {!isLoading && rightIcon && (
         <span className="ml-2">{rightIcon}</span>
       )}
-    </button>
+    </animated.button>
   );
 };
 

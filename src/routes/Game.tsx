@@ -1,13 +1,19 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, Settings, Pause, Play } from 'react-feather';
+import { Home, Settings, Pause, Play, Package, User, Users, BookOpen, Menu } from 'react-feather';
 import { Button, LoadingSpinner } from '../components/ui';
 import { Container } from '../components/layout';
 import { GameCanvas, TouchControls, GameUI } from '../components/game';
-import { useGameStore, useGameState, usePlayerState, useUIState } from '../stores';
+import { SettingsMenu, MainMenu } from '../components/ui';
+import { Inventory, PlayerStatus, CompanionList, Tutorial, Onboarding } from '../components/game';
+import { useGameStore, useGameState, usePlayerState, useAnimalState, useUIState } from '../stores';
 import { MapManager, createMapManager, GameMap } from '../game';
 import { MAP_REGISTRY, DEFAULT_MAP_ID } from '../data/maps';
 import { Position } from '../types/game';
+import { Animal, createAnimal } from '../game/Animal';
+import { AnimalSpawner, createAnimalSpawner } from '../game/AnimalSpawner';
+import { AnimalAI, createAIContext } from '../game/AnimalAI';
+import { ProximityDetector, createProximityDetector } from '../game/ProximityDetection';
 
 const Game: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -20,13 +26,30 @@ const Game: React.FC = () => {
     console.log('Initial hasShownWelcome state from localStorage:', stored);
     return stored === 'true';
   });
+
+  // UI State
+  const [showSettings, setShowSettings] = useState(false);
+  const [showMainMenu, setShowMainMenu] = useState(false);
+  const [showInventory, setShowInventory] = useState(false);
+  const [showPlayerStatus, setShowPlayerStatus] = useState(false);
+  const [showCompanionList, setShowCompanionList] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showGameMenu, setShowGameMenu] = useState(false);
   
   // Map system refs
   const mapManagerRef = useRef<MapManager | null>(null);
   
+  // Animal system refs
+  const animalSpawnerRef = useRef<AnimalSpawner | null>(null);
+  const proximityDetectorRef = useRef<ProximityDetector | null>(null);
+  const gameLoopRef = useRef<number | null>(null);
+  const lastFrameTimeRef = useRef<number>(0);
+  
   // Zustand store hooks
   const gameState = useGameState();
   const playerState = usePlayerState();
+  const animalState = useAnimalState();
   const uiState = useUIState();
   const { 
     startGame, 
@@ -37,7 +60,13 @@ const Game: React.FC = () => {
     setMovementTarget,
     moveTowardsTarget,
     addNotification,
-    toggleDebugInfo 
+    toggleDebugInfo,
+    addAnimal,
+    removeAnimal,
+    updateAnimal,
+    clearAllAnimals,
+    openModal,
+    closeModal
   } = useGameStore();
 
   // Safe pathfinding that respects map collision
@@ -172,6 +201,87 @@ const Game: React.FC = () => {
         setCurrentMap(initialMap);
         setLoadingProgress(90);
         
+        // Initialize animal systems
+        setLoadingStage('Spawning animals...');
+        
+        // Create animal spawner
+        const animalSpawner = createAnimalSpawner({
+          enabled: true,
+          maxTotalAnimals: 8,
+          globalSpawnRate: 1.0,
+          despawnDistance: 20,
+          despawnTime: 120000,
+          playerProximityCheck: true
+        });
+        
+        // Create proximity detector
+        const proximityDetector = createProximityDetector();
+        
+        // Set up animal spawner callbacks
+        animalSpawner.setCallbacks({
+          onAnimalSpawned: (animal) => {
+            console.log('Animal spawned:', animal.species, 'at', animal.position);
+            addAnimal(animal);
+            stableAddNotification({
+              type: 'info',
+              title: `${animal.species.charAt(0).toUpperCase() + animal.species.slice(1)} spotted!`,
+              message: `A wild ${animal.species} has appeared nearby`,
+              duration: 3000
+            });
+          },
+          onAnimalDespawned: (animalId) => {
+            console.log('Animal despawned:', animalId);
+            removeAnimal(animalId);
+          },
+          onSpawnAttempt: (species, position, success) => {
+            console.log('Spawn attempt:', species, 'at', position, success ? 'succeeded' : 'failed');
+          }
+        });
+        
+        // Set up proximity detector callbacks
+        proximityDetector.setCallbacks({
+          onProximityEvent: (event) => {
+            console.log('Proximity event:', event.type, event.zone.name, event.animal.species);
+            if (event.type === 'enter' && event.zone.name === 'awareness') {
+              stableAddNotification({
+                type: 'info',
+                title: `${event.animal.species.charAt(0).toUpperCase() + event.animal.species.slice(1)} notices you`,
+                message: `The ${event.animal.species} is aware of your presence`,
+                duration: 2000
+              });
+            }
+          },
+          onInteractionOpportunity: (opportunity) => {
+            console.log('Interaction opportunity:', opportunity.interactionType, opportunity.animal.species);
+          },
+          onAnimalReaction: (animal, reaction) => {
+            console.log('Animal reaction:', animal.species, reaction);
+          }
+        });
+        
+        // Create spawn points for the map
+        const mapDimensions = initialMap.getDimensions();
+        animalSpawner.createSpawnPointsForMap(mapDimensions.width, mapDimensions.height, 'temperate');
+        
+        // Spawn initial animals
+        const initialAnimals: Animal[] = [];
+        const animalSpecies = ['rabbit', 'bird', 'squirrel', 'butterfly'] as const;
+        
+        for (let i = 0; i < 5; i++) {
+          const species = animalSpecies[Math.floor(Math.random() * animalSpecies.length)];
+          const x = 5 + Math.random() * (mapDimensions.width - 10);
+          const y = 5 + Math.random() * (mapDimensions.height - 10);
+          
+          const animal = createAnimal(`initial_${species}_${i}`, species, { x, y });
+          initialAnimals.push(animal);
+          addAnimal(animal);
+        }
+        
+        animalSpawnerRef.current = animalSpawner;
+        proximityDetectorRef.current = proximityDetector;
+        
+        setLoadingProgress(95);
+        
         // Final setup
         setLoadingStage('Starting game...');
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -215,6 +325,41 @@ const Game: React.FC = () => {
 
     initGame();
   }, []); // Empty dependency array - only run once on mount
+
+  // Turn-based animal AI updates (triggered by player movement)
+  useEffect(() => {
+    if (!gameInitialized || !animalSpawnerRef.current || !proximityDetectorRef.current) {
+      return;
+    }
+
+    const currentTime = Date.now();
+    const spawner = animalSpawnerRef.current;
+    const proximityDetector = proximityDetectorRef.current;
+
+    try {
+      // Update animal spawner (less frequently)
+      const newAnimals = spawner.update(playerState.player.position, currentTime);
+      
+      // Update animal AI - this is now turn-based
+      const activeAnimals = animalState.animals.filter(animal => animal.isActive);
+      const aiContext = createAIContext(playerState.player.position, currentTime, 500); // Fixed delta for turn-based
+      
+      for (const animal of activeAnimals) {
+        const result = AnimalAI.updateAI(animal, aiContext);
+        
+        // Update animal in store if it changed
+        if (result.stateChanged || result.memoryUpdated) {
+          updateAnimal(animal.id, animal);
+        }
+      }
+
+      // Update proximity detection
+      proximityDetector.update(activeAnimals, playerState.player.position);
+
+    } catch (error) {
+      console.error('Turn-based AI update error:', error);
+    }
+  }, [gameInitialized, playerState.player.position, animalState.animals, updateAnimal]); // Triggers on player position change
 
   // Movement loop for tap-to-move functionality
   useEffect(() => {
@@ -462,8 +607,21 @@ const Game: React.FC = () => {
             >
               {gameState.isPaused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
             </Button>
-            <Button variant="ghost" size="sm" className="text-white hover:bg-white hover:bg-opacity-20">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setShowSettings(true)}
+              className="text-white hover:bg-white hover:bg-opacity-20"
+            >
               <Settings className="w-5 h-5" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setShowGameMenu(true)}
+              className="text-white hover:bg-white hover:bg-opacity-20"
+            >
+              <Menu className="w-5 h-5" />
             </Button>
           </div>
         </div>
@@ -482,7 +640,56 @@ const Game: React.FC = () => {
             movementPath={playerState.movementPath}
             showGrid={uiState.showGrid}
             currentMap={currentMap}
+            animals={animalState.animals}
+            onAnimalClick={(animal) => {
+              stableAddNotification({
+                type: 'info',
+                title: `${animal.species.charAt(0).toUpperCase() + animal.species.slice(1)}`,
+                message: `This ${animal.species} is ${animal.ai.currentState}. ${animal.visual.emoteIcon || ''}`,
+                duration: 3000
+              });
+            }}
           />
+          
+          {/* Quick Access UI Buttons */}
+          <div className="absolute top-20 left-4 flex flex-col gap-2 z-40">
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setShowInventory(true)}
+              className="inventory-button shadow-lg"
+              leftIcon={<Package size={16} />}
+            >
+              Inventory
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setShowPlayerStatus(true)}
+              className="shadow-lg"
+              leftIcon={<User size={16} />}
+            >
+              Status
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowCompanionList(true)}
+              className="companion-button shadow-lg bg-white"
+              leftIcon={<Users size={16} />}
+            >
+              Companions
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowTutorial(true)}
+              className="shadow-lg bg-white bg-opacity-80"
+              leftIcon={<BookOpen size={16} />}
+            >
+              Help
+            </Button>
+          </div>
           
           {/* Enhanced Game UI Overlay */}
           <GameUI 
@@ -492,28 +699,56 @@ const Game: React.FC = () => {
             currentTile={currentMap ? currentMap.getTile(playerState.player.position.x, playerState.player.position.y) : undefined}
             gameStats={{
               fps: 60, // This would come from the game loop
-              entityCount: 0,
+              entityCount: animalState.animals.filter(a => a.isActive).length,
               tileCount: currentMap ? currentMap.getDimensions().width * currentMap.getDimensions().height : 0,
             }}
           />
           
-          {/* Notifications */}
+          {/* Stacked Notifications */}
           {uiState.notifications.length > 0 && (
-            <div className="absolute top-4 right-4 space-y-2">
-              {uiState.notifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  className={`p-3 rounded shadow-lg text-white max-w-xs ${
-                    notification.type === 'success' ? 'bg-green-500' :
-                    notification.type === 'error' ? 'bg-red-500' :
-                    notification.type === 'warning' ? 'bg-yellow-500' :
-                    'bg-blue-500'
-                  }`}
+            <div className="absolute top-4 right-4">
+              {uiState.notifications.slice(-3).map((notification, index) => {
+                const isTop = index === uiState.notifications.slice(-3).length - 1;
+                const offset = (uiState.notifications.slice(-3).length - 1 - index) * 8;
+                const opacity = isTop ? 1 : 0.7 - (offset * 0.1);
+                const scale = isTop ? 1 : 0.95 - (offset * 0.02);
+                
+                return (
+                  <div
+                    key={notification.id}
+                    className={`absolute p-3 rounded shadow-lg text-white max-w-xs transition-all duration-200 ${
+                      notification.type === 'success' ? 'bg-green-500' :
+                      notification.type === 'error' ? 'bg-red-500' :
+                      notification.type === 'warning' ? 'bg-yellow-500' :
+                      'bg-blue-500'
+                    }`}
+                    style={{
+                      top: `${offset}px`,
+                      right: `${offset}px`,
+                      opacity,
+                      transform: `scale(${scale})`,
+                      zIndex: 50 - index
+                    }}
+                  >
+                    <div className="font-medium text-sm">{notification.title}</div>
+                    {isTop && (
+                      <div className="text-xs opacity-90">{notification.message}</div>
+                    )}
+                  </div>
+                );
+              })}
+              
+              {/* Message Log Button */}
+              {uiState.notifications.length > 1 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => openModal('messageLog')}
+                  className="absolute -bottom-12 right-0 bg-black bg-opacity-70 text-white hover:bg-opacity-90 text-xs px-2 py-1"
                 >
-                  <div className="font-medium">{notification.title}</div>
-                  <div className="text-sm opacity-90">{notification.message}</div>
-                </div>
-              ))}
+                  📝 {uiState.notifications.length} messages
+                </Button>
+              )}
             </div>
           )}
         </div>
@@ -526,6 +761,74 @@ const Game: React.FC = () => {
           showLabels={true}
         />
       </main>
+
+      {/* Message Log Modal */}
+      {uiState.activeModal === 'messageLog' && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-md max-h-96 flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b">
+              <h2 className="text-lg font-bold text-gray-800">Message Log</h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={closeModal}
+                className="text-gray-600 hover:text-gray-800"
+              >
+                ✕
+              </Button>
+            </div>
+            
+            {/* Message List */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-2">
+              {uiState.notifications.length === 0 ? (
+                <p className="text-gray-500 text-center">No messages yet</p>
+              ) : (
+                uiState.notifications.slice().reverse().map((notification) => (
+                  <div
+                    key={notification.id}
+                    className={`p-3 rounded border-l-4 ${
+                      notification.type === 'success' ? 'bg-green-50 border-green-500' :
+                      notification.type === 'error' ? 'bg-red-50 border-red-500' :
+                      notification.type === 'warning' ? 'bg-yellow-50 border-yellow-500' :
+                      'bg-blue-50 border-blue-500'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="font-medium text-sm text-gray-800">
+                          {notification.title}
+                        </div>
+                        <div className="text-xs text-gray-600 mt-1">
+                          {notification.message}
+                        </div>
+                      </div>
+                      <div className="text-xs text-gray-400 ml-2">
+                        {new Date(notification.timestamp).toLocaleTimeString()}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+            
+            {/* Footer */}
+            <div className="p-4 border-t bg-gray-50 rounded-b-lg">
+              <div className="flex items-center justify-between text-sm text-gray-600">
+                <span>{uiState.notifications.length} total messages</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={closeModal}
+                  className="text-xs"
+                >
+                  Close
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Pause Overlay */}
       {gameState.isPaused && (
@@ -551,6 +854,152 @@ const Game: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* UI Component Modals */}
+      <SettingsMenu
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+        onSave={(settings) => {
+          console.log('Settings saved:', settings);
+          setShowSettings(false);
+        }}
+      />
+
+      <MainMenu
+        isOpen={showMainMenu}
+        onClose={() => setShowGameMenu(false)}
+        onNewGame={() => {
+          console.log('New game requested');
+          setShowGameMenu(false);
+        }}
+        onLoadGame={(slotId) => {
+          console.log('Load game from slot:', slotId);
+          setShowGameMenu(false);
+        }}
+        onSettings={() => {
+          setShowGameMenu(false);
+          setShowSettings(true);
+        }}
+        onAbout={() => {
+          console.log('Show about');
+          setShowGameMenu(false);
+        }}
+        showHomeOption={true}
+        onGoHome={() => {
+          setShowGameMenu(false);
+          // Navigate to home - would integrate with router
+        }}
+      />
+
+      <Inventory
+        isOpen={showInventory}
+        onClose={() => setShowInventory(false)}
+        onUseItem={(itemId, targetId) => {
+          console.log('Using item:', itemId, 'on target:', targetId);
+          return { success: true, message: 'Item used successfully!', itemConsumed: true, quantityUsed: 1 };
+        }}
+        selectedAnimalId={undefined}
+      />
+
+      <PlayerStatus
+        isOpen={showPlayerStatus}
+        playerName={playerState.player.name}
+        stats={{
+          level: 1,
+          experience: 150,
+          experienceToNext: 200,
+          energy: 85,
+          maxEnergy: 100,
+          health: 95,
+          maxHealth: 100,
+          totalPlayTime: 1800
+        }}
+        progress={{
+          animalsDiscovered: animalState.animals.length,
+          animalsTamed: 0,
+          tricksLearned: 0,
+          mapsExplored: 1,
+          itemsCollected: 0,
+          achievementsUnlocked: 0
+        }}
+        location={{
+          currentMap: currentMap?.getMetadata().displayName || 'Unknown',
+          region: 'Starter Meadow',
+          coordinates: playerState.player.position,
+          biome: 'Temperate'
+        }}
+        companionCount={0}
+        inventoryCount={0}
+        maxInventorySlots={20}
+        onToggleCollapse={() => setShowPlayerStatus(false)}
+      />
+
+      <CompanionList
+        isOpen={showCompanionList}
+        onClose={() => setShowCompanionList(false)}
+        companions={[]}
+        onSelectCompanion={(companion) => {
+          console.log('Selected companion:', companion);
+        }}
+        onFeedCompanion={(companionId) => {
+          console.log('Feeding companion:', companionId);
+        }}
+        onPlayWithCompanion={(companionId) => {
+          console.log('Playing with companion:', companionId);
+        }}
+        onTrainCompanion={(companionId) => {
+          console.log('Training companion:', companionId);
+        }}
+      />
+
+      <Tutorial
+        isOpen={showTutorial}
+        onClose={() => setShowTutorial(false)}
+        currentTutorial={{
+          id: 'basic_controls',
+          title: 'Basic Controls',
+          description: 'Learn the basic game controls',
+          category: 'basic',
+          steps: [
+            {
+              id: 'welcome',
+              title: 'Welcome!',
+              content: 'Welcome to Feral Friends! This tutorial will teach you the basics.',
+              type: 'info',
+              skipable: true,
+              actionRequired: false
+            },
+            {
+              id: 'movement',
+              title: 'Movement',
+              content: 'Tap anywhere on the screen to move your character to that location.',
+              type: 'demonstration',
+              targetElement: '.game-canvas',
+              skipable: true,
+              actionRequired: false
+            }
+          ]
+        }}
+        onComplete={(tutorialId) => {
+          console.log('Tutorial completed:', tutorialId);
+          setShowTutorial(false);
+        }}
+        onSkip={() => setShowTutorial(false)}
+        completedTutorials={[]}
+      />
+
+      <Onboarding
+        isOpen={showOnboarding}
+        onComplete={() => {
+          console.log('Onboarding completed');
+          setShowOnboarding(false);
+        }}
+        onSkip={() => {
+          console.log('Onboarding skipped');
+          setShowOnboarding(false);
+        }}
+        playerName={playerState.player.name}
+      />
     </div>
   );
 };
