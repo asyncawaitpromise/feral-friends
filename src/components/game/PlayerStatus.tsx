@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { animated } from '@react-spring/web';
+import { animated, useSpring } from '@react-spring/web';
 import { 
   User, 
   MapPin, 
@@ -8,14 +8,14 @@ import {
   Zap, 
   Star, 
   Users, 
-  Trophy,
+  Award,
   Clock,
   ChevronDown,
   ChevronUp,
   Eye,
   EyeOff
 } from 'react-feather';
-import { useSpring, useFadeIn } from '../../hooks/useAnimation';
+import { useFadeIn } from '../../hooks/useAnimation';
 
 interface PlayerStats {
   level: number;
@@ -361,7 +361,7 @@ export const PlayerStatus: React.FC<PlayerStatusProps> = ({
                     />
                     
                     <StatItem
-                      icon={<Trophy size={16} />}
+                      icon={<Award size={16} />}
                       label="Achievements"
                       value={progress.achievementsUnlocked}
                       color="text-purple-500"

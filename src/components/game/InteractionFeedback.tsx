@@ -8,9 +8,9 @@ import { ApproachResult } from '../../game/ApproachSystem';
 import { Animal } from '../../game/Animal';
 
 export interface InteractionFeedbackProps {
-  result?: InteractionResult;
-  approachResult?: ApproachResult;
-  animal?: Animal;
+  result?: InteractionResult | undefined;
+  approachResult?: ApproachResult | undefined;
+  animal?: Animal | undefined;
   position: { x: number; y: number }; // Screen position for feedback
   onComplete?: () => void;
   className?: string;
@@ -26,7 +26,8 @@ const INTERACTION_COLORS = {
   interact: { success: '#8b5cf6', failure: '#ef4444' },   // Purple/Red
   feed: { success: '#f97316', failure: '#ef4444' },       // Orange/Red
   pet: { success: '#ec4899', failure: '#ef4444' },        // Pink/Red
-  play: { success: '#6366f1', failure: '#ef4444' }        // Indigo/Red
+  play: { success: '#6366f1', failure: '#ef4444' },       // Indigo/Red
+  talk: { success: '#06b6d4', failure: '#ef4444' }        // Cyan/Red
 };
 
 // Icons for different interaction types
@@ -36,7 +37,8 @@ const INTERACTION_ICONS: Record<InteractionType, React.ReactNode> = {
   interact: <CheckCircle className="w-6 h-6" />,
   feed: <Heart className="w-6 h-6" />,
   pet: <Heart className="w-6 h-6" />,
-  play: <Zap className="w-6 h-6" />
+  play: <Zap className="w-6 h-6" />,
+  talk: <CheckCircle className="w-6 h-6" />
 };
 
 const InteractionFeedback: React.FC<InteractionFeedbackProps> = ({
@@ -50,7 +52,7 @@ const InteractionFeedback: React.FC<InteractionFeedbackProps> = ({
   const [isVisible, setIsVisible] = useState(false);
   const [animation, setAnimation] = useState<FeedbackAnimation>('bounce');
   const [particleEffects, setParticleEffects] = useState<Array<{ id: string; x: number; y: number; delay: number }>>([]);
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<number>();
   const audioRef = useRef<HTMLAudioElement>();
 
   // Show feedback when result changes
@@ -123,7 +125,7 @@ const InteractionFeedback: React.FC<InteractionFeedbackProps> = ({
         case 'observe': return 2000;
         case 'approach': return 2500;
         case 'interact': return 3000;
-        case 'feed': case 'pet': case 'play': return 3500;
+        case 'feed': case 'pet': case 'play': case 'talk': return 3500;
         default: return 2500;
       }
     }

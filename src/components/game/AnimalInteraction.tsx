@@ -4,7 +4,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Eye, Heart, Gift, Play, Users, Smile, MessageCircle } from 'react-feather';
 import { Button } from '../ui';
-import { Animal, getAnimalEmotion } from '../../game/Animal';
+import { getAnimalEmotion } from '../../game/Animal';
 import { InteractionType, InteractionZone, InteractionResult } from '../../game/InteractionSystem';
 
 export interface AnimalInteractionProps {
@@ -209,7 +209,7 @@ const AnimalInteraction: React.FC<AnimalInteractionProps> = ({
               {zone.availableInteractions.map((interaction) => (
                 <Button
                   key={interaction}
-                  variant="solid"
+                  variant="primary"
                   size="sm"
                   onClick={() => handleInteract(interaction)}
                   disabled={selectedInteraction === interaction}
@@ -307,7 +307,7 @@ export const CompactAnimalInteraction: React.FC<CompactAnimalInteractionProps> =
           {selectedZone.availableInteractions.slice(0, 3).map((interaction) => (
             <Button
               key={interaction}
-              variant="solid"
+              variant="primary"
               size="sm"
               onClick={() => onInteract(interaction)}
               className={`

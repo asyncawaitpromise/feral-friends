@@ -13,3 +13,4 @@ export { default as Tutorial } from './Tutorial';
 export { default as Onboarding } from './Onboarding';
 export { default as TamingInterface } from './TamingInterface';
 export { default as TrickTeaching } from './TrickTeaching';
+export { default as ItemUsage } from './ItemUsage';

@@ -11,7 +11,7 @@ import {
   Settings,
   CheckCircle,
   SkipForward,
-  Sparkles
+  Zap
 } from 'react-feather';
 import { useSlideIn, useFadeIn, useStagger } from '../../hooks/useAnimation';
 import { useSound } from '../../hooks/useAudio';
@@ -97,7 +97,7 @@ const ONBOARDING_TUTORIALS: Record<string, TutorialConfig> = {
         id: 'exploration_encourage',
         title: 'Start Exploring!',
         content: 'Try moving to different areas. Each terrain type may be home to different animals. Look for grass, water, flowers, and other interesting spots!',
-        icon: <Sparkles size={20} />,
+        icon: <Zap size={20} />,
         type: 'action',
         tips: [
           'Animals often appear near their preferred habitats',

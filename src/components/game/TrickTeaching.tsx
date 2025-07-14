@@ -17,7 +17,7 @@ import {
   ArrowUp,
   ArrowDown,
   RotateCw,
-  Hand,
+  MousePointer,
   Eye,
   Heart,
   Activity,
@@ -349,11 +349,11 @@ export const TrickTeaching: React.FC<TrickTeachingProps> = ({
   // Render gesture instruction
   const renderGestureInstruction = (gesture: TrickGesture) => {
     const icons = {
-      tap: <Hand size={24} />,
+      tap: <MousePointer size={24} />,
       swipe: gesture.direction === 'up' ? <ArrowUp size={24} /> :
              gesture.direction === 'down' ? <ArrowDown size={24} /> :
              gesture.direction === 'left' ? <ArrowLeft size={24} /> :
-             gesture.direction === 'right' ? <ArrowRight size={24} /> : <Hand size={24} />,
+             gesture.direction === 'right' ? <ArrowRight size={24} /> : <MousePointer size={24} />,
       hold: <Clock size={24} />,
       double_tap: <Target size={24} />,
       circle: <RotateCw size={24} />

@@ -3,19 +3,12 @@ import { animated } from '@react-spring/web';
 import { 
   HelpCircle, 
   X, 
-  Lightbulb, 
-  ArrowDown, 
-  ArrowUp, 
-  ArrowLeft, 
-  ArrowRight,
-  Eye,
+  Zap, 
   MousePointer,
   Heart,
   Star,
   Package,
-  Users,
-  Zap,
-  AlertCircle
+  Users
 } from 'react-feather';
 import { useBounce, useFadeIn, useSlideIn } from '../../hooks/useAnimation';
 import { useSound } from '../../hooks/useAudio';
@@ -151,7 +144,7 @@ const CONTEXTUAL_TIPS: ContextualTip[] = [
     id: 'struggling_with_animals',
     title: 'Having Trouble with Animals?',
     content: 'Animals have different personalities. Try different approaches: some like treats, others prefer toys, and some just want gentle patience.',
-    icon: <Lightbulb size={16} />,
+    icon: <Zap size={16} />,
     priority: 'medium',
     category: 'troubleshooting',
     triggers: [
