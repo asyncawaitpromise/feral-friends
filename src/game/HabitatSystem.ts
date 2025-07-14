@@ -1,7 +1,8 @@
 // Habitat System
 // Manages biome-specific animal spawning, behavior, and environmental interactions
 
-import { Animal, AnimalSpecies, Position, isPositionSuitableForSpecies } from './Animal';
+import { Animal, AnimalSpecies, isPositionSuitableForSpecies } from './Animal';
+import { Position } from '../types/game';
 import { RARE_VARIANTS, shouldSpawnRareVariant, createRareAnimal } from './RareAnimals';
 
 export type BiomeType = 
@@ -33,7 +34,7 @@ export interface BiomeData {
   carryingCapacity: Record<AnimalSpecies, number>;
   
   // Food availability affects happiness and spawning
-  foodAvailability: Record<AnimalSpecies, number>;
+  foodAvailability: Partial<Record<AnimalSpecies, number>>;
   
   // Shelter quality affects safety and weather resistance
   shelterQuality: number; // 0-100%
@@ -661,10 +662,10 @@ export function getHabitatHappinessModifier(animal: Animal, zone: HabitatZone): 
  */
 export function shouldSpawnRareInZone(
   zone: HabitatZone,
-  species: AnimalSpecies,
-  season: string,
-  weather: string,
-  timeOfDay: string
+  _species: AnimalSpecies,
+  _season: string,
+  _weather: string,
+  _timeOfDay: string
 ): boolean {
   // Higher quality zones have better chance for rare spawns
   const qualityBonus = zone.quality / 100;

@@ -284,6 +284,8 @@ export class InputManager {
     const now = Date.now();
     const state = this.inputState[action];
     
+    if (!state) return;
+    
     if (pressed && !state.pressed) {
       // Just pressed
       state.pressed = true;
@@ -301,8 +303,8 @@ export class InputManager {
       action,
       pressed,
       timestamp: now,
-      position,
-      originalEvent,
+      ...(position && { position }),
+      ...(originalEvent && { originalEvent }),
     };
     
     // Add to buffer
@@ -351,6 +353,8 @@ export class InputManager {
     
     for (let i = 0; i < event.changedTouches.length; i++) {
       const touch = event.changedTouches[i];
+      if (!touch) continue;
+      
       const rect = this.element.getBoundingClientRect();
       const position = {
         x: touch.clientX - rect.left,
@@ -380,6 +384,8 @@ export class InputManager {
     
     for (let i = 0; i < event.changedTouches.length; i++) {
       const touch = event.changedTouches[i];
+      if (!touch) continue;
+      
       const touchState = this.touches.get(touch.identifier);
       
       if (touchState) {
@@ -400,6 +406,8 @@ export class InputManager {
     
     for (let i = 0; i < event.changedTouches.length; i++) {
       const touch = event.changedTouches[i];
+      if (!touch) continue;
+      
       const touchState = this.touches.get(touch.identifier);
       
       if (touchState) {
@@ -431,6 +439,8 @@ export class InputManager {
   private handleTouchCancel(event: TouchEvent): void {
     for (let i = 0; i < event.changedTouches.length; i++) {
       const touch = event.changedTouches[i];
+      if (!touch) continue;
+      
       this.touches.delete(touch.identifier);
     }
   }

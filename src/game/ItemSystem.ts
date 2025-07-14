@@ -1,6 +1,5 @@
 import { InventoryItem, ItemEffect, ItemRequirement } from './InventorySystem';
 import { Animal } from './Animal';
-import { PersonalityProfile, animalPersonality } from './AnimalPersonality';
 
 export type ItemCategory = 'tool' | 'toy' | 'treat' | 'craft' | 'special' | 'collectible';
 export type ToolType = 'net' | 'rope' | 'whistle' | 'mirror' | 'brush' | 'camera' | 'lantern';

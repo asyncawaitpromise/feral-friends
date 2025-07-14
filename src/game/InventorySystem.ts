@@ -1,6 +1,6 @@
 export interface InventoryItem {
   id: string;
-  type: 'food' | 'tool' | 'toy' | 'misc' | 'special';
+  type: 'food' | 'tool' | 'toy' | 'misc' | 'special' | 'craft' | 'collectible';
   name: string;
   description: string;
   icon: string; // emoji or icon identifier
@@ -33,7 +33,7 @@ export interface InventorySlot {
   index: number;
   item: InventoryItem | null;
   isLocked: boolean;
-  category?: string;
+  category?: string | undefined;
 }
 
 export interface InventoryConfig {

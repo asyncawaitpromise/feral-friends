@@ -302,7 +302,7 @@ const Game: React.FC = () => {
         
         if (!hasShownWelcome) {
           console.log('🎉 Showing welcome notification for the first time');
-          tracedAddNotification({
+          stableAddNotification({
             type: 'success',
             title: 'Welcome to Feral Friends!',
             message: `You've arrived at the ${initialMap.getMetadata().displayName}`,
@@ -318,7 +318,7 @@ const Game: React.FC = () => {
         
       } catch (error) {
         console.error('Failed to initialize game:', error);
-        tracedAddNotification({
+        stableAddNotification({
           type: 'error',
           title: 'Loading Failed',
           message: 'Failed to load the game. Please refresh and try again.',
@@ -498,7 +498,7 @@ const Game: React.FC = () => {
     // Check if target position is valid on the current map
     if (!currentMap.isValidPosition(gridX, gridY)) {
       console.log('Invalid position, showing warning notification');
-      tracedAddNotification({
+      stableAddNotification({
         type: 'warning',
         title: 'Invalid location',
         message: 'Cannot move outside map boundaries',
@@ -510,7 +510,7 @@ const Game: React.FC = () => {
     // Check if target position is walkable
     if (!currentMap.isWalkable(gridX, gridY)) {
       const tile = currentMap.getTile(gridX, gridY);
-      tracedAddNotification({
+      stableAddNotification({
         type: 'warning',
         title: 'Blocked path',
         message: `Cannot walk on ${tile?.terrainType || 'this terrain'}`,
@@ -531,7 +531,7 @@ const Game: React.FC = () => {
     if (transitions.length > 0) {
       // Handle map transition
       const transition = transitions[0];
-      tracedAddNotification({
+      stableAddNotification({
         type: 'info',
         title: 'Transition available',
         message: `Press action button to ${transition.description || 'continue'}`,
@@ -545,7 +545,7 @@ const Game: React.FC = () => {
     // Check if we could create a path to the target
     if (safePath.length === 0) {
       // No path found - target is unreachable
-      tracedAddNotification({
+      stableAddNotification({
         type: 'warning',
         title: 'Unreachable destination',
         message: 'Cannot find a path to that location',
@@ -559,7 +559,7 @@ const Game: React.FC = () => {
     
     // Get current tile info for feedback
     const targetTile = currentMap.getTile(gridX, gridY);
-    tracedAddNotification({
+    stableAddNotification({
       type: 'info',
       title: 'Moving to destination',
       message: `Walking to ${targetTile?.terrainType || 'unknown'} at (${gridX}, ${gridY})`,
@@ -572,7 +572,7 @@ const Game: React.FC = () => {
     
     if (action === 'A') {
       // Action button - interact with environment
-      tracedAddNotification({
+      stableAddNotification({
         type: 'info',
         title: 'Action!',
         message: 'Looking for something to interact with...',

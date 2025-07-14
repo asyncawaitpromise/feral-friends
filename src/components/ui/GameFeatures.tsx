@@ -2,7 +2,7 @@ import React from 'react';
 import { Heart, Zap, Users, Map, Eye, Gift, Star, Compass } from 'react-feather';
 
 interface Feature {
-  icon: React.ComponentType<{ className?: string }>;
+  icon: React.ComponentType<any>;
   title: string;
   description: string;
   color: string;
