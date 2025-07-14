@@ -6,3 +6,10 @@ export { default as InteractionPrompt, CompactInteractionPrompt, useInteractionP
 export { default as AnimalInteraction, CompactAnimalInteraction } from './AnimalInteraction';
 export { default as InteractionFeedback, MultiFeedback, useInteractionFeedback } from './InteractionFeedback';
 export { default as DialogueBox } from './DialogueBox';
+export { CompanionList } from './CompanionList';
+export { default as Inventory } from './Inventory';
+export { default as PlayerStatus } from './PlayerStatus';
+export { default as Tutorial } from './Tutorial';
+export { default as Onboarding } from './Onboarding';
+export { default as TamingInterface } from './TamingInterface';
+export { default as TrickTeaching } from './TrickTeaching';

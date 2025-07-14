@@ -8,7 +8,7 @@ import {
   X, 
   MoreVertical,
   Trash2,
-  Split,
+  Scissors,
   Info,
   Star
 } from 'react-feather';
@@ -556,7 +556,7 @@ export const Inventory: React.FC<InventoryProps> = ({
               onClick={() => handleContextMenuAction('split', showContextMenu.slotIndex)}
               className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
             >
-              <Split size={12} className="inline mr-2" />
+              <Scissors size={12} className="inline mr-2" />
               Split Stack
             </button>
             <button
