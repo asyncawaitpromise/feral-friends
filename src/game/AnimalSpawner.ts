@@ -442,6 +442,11 @@ export class AnimalSpawner {
         y: spawnPoint.position.y + Math.sin(angle) * distance
       };
 
+      // Validate position is within reasonable bounds (non-negative)
+      if (position.x < 0 || position.y < 0) {
+        continue;
+      }
+
       // Make sure position is not too close to player
       const distanceToPlayer = Math.sqrt(
         Math.pow(position.x - playerPosition.x, 2) + 

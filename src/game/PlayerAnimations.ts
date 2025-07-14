@@ -39,13 +39,41 @@ export class PlayerAnimations {
   }
 
   startMovement(targetPosition: { x: number; y: number }): void {
-    this.animationState.targetPosition = { ...targetPosition };
-    this.animationState.isMoving = true;
-    this.animationState.animationProgress = 0;
-    this.animationState.lastMoveTime = Date.now();
-    this.animationState.direction = this.calculateDirection(
+    // If already moving, update target smoothly without resetting progress
+    if (this.animationState.isMoving) {
+      // Update the starting position to current animated position for smooth transition
+      const currentAnimatedPosition = this.getCurrentAnimatedPosition();
+      this.animationState.position = currentAnimatedPosition;
+      this.animationState.targetPosition = { ...targetPosition };
+      this.animationState.animationProgress = 0;
+      this.animationState.lastMoveTime = Date.now();
+      this.animationState.direction = this.calculateDirection(
+        currentAnimatedPosition,
+        targetPosition
+      );
+    } else {
+      // Starting fresh movement
+      this.animationState.targetPosition = { ...targetPosition };
+      this.animationState.isMoving = true;
+      this.animationState.animationProgress = 0;
+      this.animationState.lastMoveTime = Date.now();
+      this.animationState.direction = this.calculateDirection(
+        this.animationState.position,
+        targetPosition
+      );
+    }
+  }
+
+  // Get current animated position during movement
+  private getCurrentAnimatedPosition(): { x: number; y: number } {
+    if (!this.animationState.isMoving) {
+      return { ...this.animationState.position };
+    }
+
+    return this.interpolatePosition(
       this.animationState.position,
-      targetPosition
+      this.animationState.targetPosition,
+      this.animationState.animationProgress
     );
   }
 
@@ -54,11 +82,16 @@ export class PlayerAnimations {
       return this.getIdleAnimation();
     }
 
-    // Update animation progress
-    const moveDuration = 300; // 300ms per tile
+    // Update animation progress with adaptive duration for smoother rapid direction changes
+    const timeSinceLastMove = Date.now() - this.animationState.lastMoveTime;
+    const baseDuration = 300; // 300ms per tile
+    
+    // Slightly faster animation if we're changing direction rapidly
+    const adaptiveDuration = timeSinceLastMove < 100 ? baseDuration * 0.8 : baseDuration;
+    
     this.animationState.animationProgress = Math.min(
       1,
-      (Date.now() - this.animationState.lastMoveTime) / moveDuration
+      timeSinceLastMove / adaptiveDuration
     );
 
     // Calculate current animated position

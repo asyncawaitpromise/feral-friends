@@ -11,9 +11,7 @@ import {
   Package,
   Star,
   Heart,
-  Play,
   SkipForward,
-  RotateCcw,
   CheckCircle
 } from 'react-feather';
 import { useSlideIn, useFadeIn, useBounce } from '../../hooks/useAnimation';
@@ -83,13 +81,10 @@ export const Tutorial: React.FC<TutorialProps> = ({
   currentTutorial,
   onComplete,
   onSkip,
-  completedTutorials,
-  showSkipOption = true,
-  autoStart = false
+  showSkipOption = true
 }) => {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isHighlighting, setIsHighlighting] = useState(false);
-  const [userProgress, setUserProgress] = useState<Record<string, boolean>>({});
   const [showHint, setShowHint] = useState(false);
   const [hintIndex, setHintIndex] = useState(0);
   
@@ -111,7 +106,6 @@ export const Tutorial: React.FC<TutorialProps> = ({
   useEffect(() => {
     if (currentTutorial) {
       setCurrentStepIndex(0);
-      setUserProgress({});
       setShowHint(false);
       setHintIndex(0);
     }
@@ -237,7 +231,7 @@ export const Tutorial: React.FC<TutorialProps> = ({
 
   const nextHint = () => {
     if (currentStep?.tips) {
-      setHintIndex(prev => (prev + 1) % currentStep.tips.length);
+      setHintIndex(prev => (prev + 1) % (currentStep.tips?.length || 1));
     }
   };
 
@@ -294,7 +288,7 @@ export const Tutorial: React.FC<TutorialProps> = ({
         )}
 
         {/* Tips Section */}
-        {currentStep.tips && currentStep.tips.length > 0 && (
+        {currentStep.tips && (currentStep.tips?.length || 0) > 0 && (
           <div className="mb-4">
             <button
               onClick={toggleHint}
@@ -309,13 +303,13 @@ export const Tutorial: React.FC<TutorialProps> = ({
                 <div className="flex items-start gap-2">
                   <Star size={16} className="text-blue-500 mt-0.5 flex-shrink-0" />
                   <div className="flex-1">
-                    <p className="text-sm text-blue-800">{currentStep.tips[hintIndex]}</p>
-                    {currentStep.tips.length > 1 && (
+                    <p className="text-sm text-blue-800">{currentStep.tips?.[hintIndex]}</p>
+                    {(currentStep.tips?.length || 0) > 1 && (
                       <button
                         onClick={nextHint}
                         className="text-xs text-blue-600 hover:text-blue-800 mt-1"
                       >
-                        Next tip ({hintIndex + 1}/{currentStep.tips.length})
+                        Next tip ({hintIndex + 1}/{currentStep.tips?.length || 0})
                       </button>
                     )}
                   </div>

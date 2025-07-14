@@ -192,7 +192,7 @@ export class AudioManager {
     const source = this.audioSources.get(id);
     if (!source || this.loadedAudio.has(id)) return;
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, _reject) => {
       const audio = new Audio();
       
       // Handle mobile audio restrictions
@@ -320,7 +320,7 @@ export class AudioManager {
 
     } catch (error) {
       // Handle autoplay restrictions
-      if (error.name === 'NotAllowedError') {
+      if ((error as Error).name === 'NotAllowedError') {
         console.log('Audio autoplay blocked - will play after user interaction');
       } else {
         console.warn(`Audio playback failed: ${id}`, error);

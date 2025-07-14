@@ -206,7 +206,7 @@ const InteractionPrompt: React.FC<InteractionPromptProps> = ({
             </Button>
             
             <Button
-              variant="solid"
+              variant="primary"
               size="sm"
               onClick={handleInteract}
               disabled={!canInteract}
@@ -276,6 +276,8 @@ export const CompactInteractionPrompt: React.FC<CompactInteractionPromptProps> =
   if (prompts.length === 0) return null;
 
   const selectedPrompt = prompts[selectedIndex];
+  if (!selectedPrompt) return null;
+  
   const colors = INTERACTION_COLORS[selectedPrompt.object.interaction.type];
 
   return (
@@ -310,7 +312,7 @@ export const CompactInteractionPrompt: React.FC<CompactInteractionPromptProps> =
 
         {/* Main interaction button */}
         <Button
-          variant="solid"
+          variant="primary"
           size="lg"
           onClick={() => onInteract(selectedPrompt.object)}
           disabled={!selectedPrompt.canInteract}

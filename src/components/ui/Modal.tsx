@@ -10,6 +10,7 @@ interface ModalProps {
   showCloseButton?: boolean;
   children: React.ReactNode;
   footer?: React.ReactNode;
+  className?: string;
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -19,7 +20,8 @@ const Modal: React.FC<ModalProps> = ({
   size = 'md',
   showCloseButton = true,
   children,
-  footer
+  footer,
+  className = ''
 }) => {
   // Close modal on escape key
   useEffect(() => {
@@ -66,7 +68,7 @@ const Modal: React.FC<ModalProps> = ({
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
         <div 
-          className={`${containerClasses} ${sizeClasses[size]} relative bg-white rounded-lg shadow-xl transform transition-all`}
+          className={`${containerClasses} ${sizeClasses[size]} ${className} relative bg-white rounded-lg shadow-xl transform transition-all`}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}

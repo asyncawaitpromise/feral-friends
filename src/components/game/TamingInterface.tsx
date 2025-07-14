@@ -2,10 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { animated } from '@react-spring/web';
 import { 
   Heart, 
-  Eye, 
-  Hand, 
-  Gift, 
-  MessageCircle, 
   ArrowLeft, 
   Star,
   Zap,
@@ -16,7 +12,6 @@ import {
   AlertTriangle,
   TrendingUp,
   Users,
-  Award,
   Target,
   Activity
 } from 'react-feather';
@@ -38,7 +33,7 @@ interface TamingInterfaceProps {
 }
 
 interface InteractionFeedback {
-  type: 'success' | 'failure' | 'info' | 'warning';
+  type: 'success' | 'failure' | 'info' | 'warning' | 'error';
   message: string;
   timestamp: number;
 }
@@ -63,17 +58,14 @@ export const TamingInterface: React.FC<TamingInterfaceProps> = ({
   const feedbackRef = useRef<HTMLDivElement>(null);
 
   // Animations
-  const interfaceAnimation = useSlideIn(isVisible, { from: { transform: 'translateY(100%)' } });
-  const trustMeterAnimation = useFloat(true, { amplitude: 2, frequency: 0.5 });
-  const interactionButtonsAnimation = useSlideIn(isVisible, { 
-    from: { transform: 'translateX(-20px)', opacity: 0 },
-    delay: 200
-  });
+  const interfaceAnimation = useSlideIn(isVisible, 'up');
+  const trustMeterAnimation = useFloat(true, 2, 2000);
+  const interactionButtonsAnimation = useSlideIn(isVisible, 'left');
   const adviceAnimation = useFadeIn(showAdvice);
   const personalityAnimation = useBounce(showPersonalityInfo);
 
   // Audio
-  const { playSuccess, playError, playClick, playNotification } = useSound();
+  const { playSuccess, playError } = useSound();
 
   // Get current taming progress
   const tamingProgress = tamingSystem.current.getTamingProgress(animal.id);
@@ -113,20 +105,8 @@ export const TamingInterface: React.FC<TamingInterfaceProps> = ({
 
     setIsInteracting(true);
     setSelectedInteraction(interactionId);
-    playClick();
 
     try {
-      // Get personality advice for this interaction
-      const personalityAdvice = personality ? 
-        animalPersonality.calculateInteractionEffectiveness(animal.id, 
-          TAMING_INTERACTIONS.find(i => i.id === interactionId)!,
-          {
-            playerApproach: 'normal',
-            environmentNoise: 'quiet',
-            timeOfDay: 'afternoon',
-            playerEnergy
-          }
-        ) : null;
 
       // Simulate interaction time
       const interaction = TAMING_INTERACTIONS.find(i => i.id === interactionId);
@@ -291,11 +271,11 @@ export const TamingInterface: React.FC<TamingInterfaceProps> = ({
             <div className="w-full bg-gray-200 rounded-full h-3">
               <div 
                 className={`h-3 rounded-full transition-all duration-500 ${
-                  trustLevelInfo.color === 'red' ? 'bg-red-500' :
-                  trustLevelInfo.color === 'orange' ? 'bg-orange-500' :
-                  trustLevelInfo.color === 'yellow' ? 'bg-yellow-500' :
-                  trustLevelInfo.color === 'blue' ? 'bg-blue-500' :
-                  trustLevelInfo.color === 'green' ? 'bg-green-500' :
+                  trustLevelInfo?.color === 'red' ? 'bg-red-500' :
+                  trustLevelInfo?.color === 'orange' ? 'bg-orange-500' :
+                  trustLevelInfo?.color === 'yellow' ? 'bg-yellow-500' :
+                  trustLevelInfo?.color === 'blue' ? 'bg-blue-500' :
+                  trustLevelInfo?.color === 'green' ? 'bg-green-500' :
                   'bg-purple-500'
                 }`}
                 style={{ width: `${currentTrust}%` }}
@@ -303,11 +283,11 @@ export const TamingInterface: React.FC<TamingInterfaceProps> = ({
             </div>
             <div className="flex justify-between items-center mt-2">
               <span className="text-xs font-medium text-gray-600">
-                {trustLevelInfo.name}
+                {trustLevelInfo?.name || 'Unknown'}
               </span>
               {nextTrustLevel && (
                 <span className="text-xs text-gray-500">
-                  Next: {nextTrustLevel.name} ({nextTrustLevel.level - currentTrust} points)
+                  Next: {nextTrustLevel.name} ({(nextTrustLevel.level || 0) - currentTrust} points)
                 </span>
               )}
             </div>
@@ -371,12 +351,12 @@ export const TamingInterface: React.FC<TamingInterfaceProps> = ({
             <h3 className="font-semibold text-green-900 mb-2">Approach Tips</h3>
             {personality && (
               <div className="space-y-2">
-                {getPersonalityAdvice()?.approachTips.slice(0, 2).map((tip, index) => (
+                {getPersonalityAdvice()?.approachTips?.slice(0, 2).map((tip, index) => (
                   <div key={index} className="flex items-start space-x-2">
                     <CheckCircle size={14} className="text-green-600 mt-0.5 flex-shrink-0" />
                     <span className="text-sm text-green-800">{tip}</span>
                   </div>
-                ))}
+                )) || []}
               </div>
             )}
           </animated.div>
@@ -387,8 +367,8 @@ export const TamingInterface: React.FC<TamingInterfaceProps> = ({
           <h3 className="font-semibold text-gray-900 mb-3">Available Interactions</h3>
           <div className="grid grid-cols-2 gap-3">
             {availableInteractions.map((interaction) => {
-              const isOnCooldown = interactionCooldowns[interaction.id] && interactionCooldowns[interaction.id] > Date.now();
-              const cooldownTime = isOnCooldown ? interactionCooldowns[interaction.id] : 0;
+              const isOnCooldown = interactionCooldowns[interaction.id] && (interactionCooldowns[interaction.id] || 0) > Date.now();
+              const cooldownTime = isOnCooldown ? (interactionCooldowns[interaction.id] || 0) : 0;
               
               return (
                 <Button
@@ -407,7 +387,7 @@ export const TamingInterface: React.FC<TamingInterfaceProps> = ({
                   {interaction.energyCost > 0 && (
                     <div className="text-xs opacity-75 flex items-center">
                       <Zap size={10} className="mr-1" />
-                      {interaction.energyCost}
+                      {interaction.energyCost || 0}
                     </div>
                   )}
                   {isOnCooldown && (
@@ -435,6 +415,7 @@ export const TamingInterface: React.FC<TamingInterfaceProps> = ({
                   {item.type === 'failure' && <XCircle size={14} className="text-red-600 mt-0.5" />}
                   {item.type === 'warning' && <AlertTriangle size={14} className="text-yellow-600 mt-0.5" />}
                   {item.type === 'info' && <Info size={14} className="text-blue-600 mt-0.5" />}
+                  {item.type === 'error' && <XCircle size={14} className="text-red-600 mt-0.5" />}
                   <span className="text-sm text-gray-700">{item.message}</span>
                 </div>
               ))}

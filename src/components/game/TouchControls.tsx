@@ -57,7 +57,7 @@ const TouchControls: React.FC<TouchControlsProps> = ({
     }
   }, []);
 
-  // D-Pad touch handlers
+  // D-Pad touch handlers - responsive without throttling
   const handleDPadTouchStart = useCallback((e: React.TouchEvent) => {
     if (disabled || !dPadRef.current) return;
     
@@ -284,7 +284,7 @@ const TouchControls: React.FC<TouchControlsProps> = ({
       </div>
 
       {/* Debug info (development only) */}
-      {process.env.NODE_ENV === 'development' && (
+      {import.meta.env?.DEV && (
         <div className="absolute top-4 left-4 bg-black bg-opacity-50 text-white p-2 rounded text-xs">
           D-Pad: {activeDirection || 'none'} | Button: {activeButton || 'none'}
         </div>

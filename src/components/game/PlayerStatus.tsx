@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { animated, useSpring } from '@react-spring/web';
 import { 
-  User, 
   MapPin, 
   Package, 
   Heart, 
@@ -80,7 +79,7 @@ export const PlayerStatus: React.FC<PlayerStatusProps> = ({
     config: { tension: 300, friction: 30 }
   });
 
-  const experiencePercentage = (stats.experience / stats.experienceToNext) * 100;
+  // const experiencePercentage = (stats.experience / stats.experienceToNext) * 100;
   const energyPercentage = (stats.energy / stats.maxEnergy) * 100;
   const healthPercentage = (stats.health / stats.maxHealth) * 100;
 

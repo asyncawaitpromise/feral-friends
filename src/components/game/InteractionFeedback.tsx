@@ -53,7 +53,6 @@ const InteractionFeedback: React.FC<InteractionFeedbackProps> = ({
   const [animation, setAnimation] = useState<FeedbackAnimation>('bounce');
   const [particleEffects, setParticleEffects] = useState<Array<{ id: string; x: number; y: number; delay: number }>>([]);
   const timeoutRef = useRef<number>();
-  const audioRef = useRef<HTMLAudioElement>();
 
   // Show feedback when result changes
   useEffect(() => {
@@ -405,13 +404,19 @@ export const useInteractionFeedback = () => {
     position: { x: number; y: number }
   ) => {
     const id = `feedback-${Date.now()}-${Math.random()}`;
-    setFeedbackQueue(prev => [...prev, {
-      id,
-      result,
-      approachResult,
-      animal,
-      position
-    }]);
+    const feedbackItem: {
+      id: string;
+      result?: InteractionResult;
+      approachResult?: ApproachResult;
+      animal?: Animal;
+      position: { x: number; y: number };
+    } = { id, position };
+    
+    if (result) feedbackItem.result = result;
+    if (approachResult) feedbackItem.approachResult = approachResult;
+    if (animal) feedbackItem.animal = animal;
+    
+    setFeedbackQueue(prev => [...prev, feedbackItem]);
   };
 
   const removeFeedback = (id: string) => {

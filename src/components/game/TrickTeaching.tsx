@@ -2,33 +2,25 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { animated, useSpring } from '@react-spring/web';
 import { 
   Play, 
-  Pause, 
-  RotateCcw, 
-  Star, 
-  Zap, 
   Clock, 
   CheckCircle, 
   XCircle, 
   Target, 
-  TrendingUp,
-  Award,
   ArrowLeft,
   ArrowRight,
   ArrowUp,
   ArrowDown,
   RotateCw,
   MousePointer,
-  Eye,
-  Heart,
   Activity,
   BookOpen,
   RefreshCw
 } from 'react-feather';
-import { useSlideIn, useFadeIn, useBounce, useStagger } from '../../hooks/useAnimation';
+import { useSlideIn, useFadeIn } from '../../hooks/useAnimation';
 import { useSound } from '../../hooks/useAudio';
 import Button from '../ui/Button';
 import { Animal } from '../../game/Animal';
-import { TrickDefinition, TeachingPhase, TrickGesture, getTrickById } from '../../data/tricks';
+import { TeachingPhase, TrickGesture, getTrickById } from '../../data/tricks';
 import { trickSystem, TrickLearningProgress, TrickAttempt } from '../../game/TrickSystem';
 
 interface TrickTeachingProps {
@@ -39,20 +31,11 @@ interface TrickTeachingProps {
   isVisible: boolean;
 }
 
-interface GestureInput {
-  type: string;
-  direction?: string;
-  duration?: number;
-  startTime: number;
-  endTime?: number;
-  accuracy: number;
-  timing: number;
-}
 
 interface VisualCue {
   type: 'tap' | 'swipe' | 'hold' | 'circle';
-  direction?: string;
-  duration?: number;
+  direction?: string | undefined;
+  duration?: number | undefined;
   active: boolean;
   success?: boolean;
 }
@@ -67,7 +50,6 @@ export const TrickTeaching: React.FC<TrickTeachingProps> = ({
   const [currentPhase, setCurrentPhase] = useState<TeachingPhase | null>(null);
   const [progress, setProgress] = useState<TrickLearningProgress | null>(null);
   const [isActive, setIsActive] = useState(false);
-  const [gestureInput, setGestureInput] = useState<GestureInput | null>(null);
   const [visualCue, setVisualCue] = useState<VisualCue | null>(null);
   const [feedback, setFeedback] = useState<string>('');
   const [attempts, setAttempts] = useState<TrickAttempt[]>([]);
@@ -78,12 +60,12 @@ export const TrickTeaching: React.FC<TrickTeachingProps> = ({
 
   const gestureAreaRef = useRef<HTMLDivElement>(null);
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
-  const holdTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const holdTimerRef = useRef<number | null>(null);
 
   const trick = getTrickById(trickId);
 
   // Animations
-  const interfaceAnimation = useSlideIn(isVisible, { from: { transform: 'translateY(100%)' } });
+  const interfaceAnimation = useSlideIn(isVisible, 'up');
   const gestureAreaAnimation = useSpring({
     transform: isActive ? 'scale(1.02)' : 'scale(1)',
     boxShadow: isActive ? '0 0 20px rgba(59, 130, 246, 0.5)' : '0 0 0px rgba(59, 130, 246, 0)'
@@ -93,10 +75,10 @@ export const TrickTeaching: React.FC<TrickTeachingProps> = ({
     config: { tension: 200, friction: 25 }
   });
   const feedbackAnimation = useFadeIn(!!feedback);
-  const instructionsAnimation = useSlideIn(showInstructions, { from: { transform: 'translateY(-100%)' } });
+  const instructionsAnimation = useSlideIn(showInstructions, 'down');
 
   // Audio
-  const { playSuccess, playError, playClick, playNotification } = useSound();
+  const { playSuccess, playError, playButtonClick } = useSound();
 
   // Initialize learning session
   useEffect(() => {
@@ -161,13 +143,13 @@ export const TrickTeaching: React.FC<TrickTeachingProps> = ({
     const gesture = currentPhase.gestures[0];
     const cue: VisualCue = {
       type: gesture.type as any,
-      direction: gesture.direction,
-      duration: gesture.duration,
+      direction: gesture.direction || undefined,
+      duration: gesture.duration || undefined,
       active: true
     };
     
     setVisualCue(cue);
-    playNotification();
+    playButtonClick();
   };
 
   // Handle touch start
@@ -176,6 +158,8 @@ export const TrickTeaching: React.FC<TrickTeachingProps> = ({
     
     e.preventDefault();
     const touch = e.touches[0];
+    if (!touch) return;
+    
     touchStartRef.current = {
       x: touch.clientX - gestureArea.x,
       y: touch.clientY - gestureArea.y,
@@ -196,6 +180,8 @@ export const TrickTeaching: React.FC<TrickTeachingProps> = ({
     
     e.preventDefault();
     const touch = e.touches[0];
+    if (!touch) return;
+    
     const currentX = touch.clientX - gestureArea.x;
     const currentY = touch.clientY - gestureArea.y;
     
@@ -264,6 +250,8 @@ export const TrickTeaching: React.FC<TrickTeachingProps> = ({
     
     // Calculate accuracy based on expected gesture
     const expectedGesture = currentPhase.gestures[0];
+    if (!expectedGesture) return;
+    
     let accuracy = 0.8; // Base accuracy
     
     if (type === expectedGesture.type) {
@@ -282,13 +270,21 @@ export const TrickTeaching: React.FC<TrickTeachingProps> = ({
     const timing = Math.random() * 0.3 + 0.7; // Simplified timing
     
     // Submit gesture attempt
-    const result = trickSystem.attemptTrickGesture(animal.id, trickId, {
+    const gestureAttempt: any = {
       type,
-      direction,
-      duration,
       accuracy: Math.min(1, accuracy),
       timing
-    });
+    };
+    
+    // Only add direction and duration if they are not undefined
+    if (direction !== undefined) {
+      gestureAttempt.direction = direction;
+    }
+    if (duration !== undefined) {
+      gestureAttempt.duration = duration;
+    }
+    
+    const result = trickSystem.attemptTrickGesture(animal.id, trickId, gestureAttempt);
     
     // Update UI based on result
     setFeedback(result.feedback);

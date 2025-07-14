@@ -108,12 +108,13 @@ const ItemUsage: React.FC<ItemUsageProps> = ({
 
     try {
       const context: ItemUseContext = {
-        targetAnimal,
-        location: playerLocation,
         timeOfDay,
         weather,
         companions
       };
+      
+      if (targetAnimal) context.targetAnimal = targetAnimal;
+      if (playerLocation) context.location = playerLocation;
 
       const result = itemSystem.useItem(selectedItem.id, context);
       
@@ -150,8 +151,8 @@ const ItemUsage: React.FC<ItemUsageProps> = ({
   const handleDragStart = useCallback((event: React.MouseEvent | React.TouchEvent) => {
     if (!selectedItem || cooldownTime > 0) return;
 
-    const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX;
-    const clientY = 'touches' in event ? event.touches[0].clientY : event.clientY;
+    const clientX = 'touches' in event ? event.touches[0]?.clientX || 0 : event.clientX;
+    const clientY = 'touches' in event ? event.touches[0]?.clientY || 0 : event.clientY;
 
     setDragState({
       isDragging: true,
@@ -166,8 +167,8 @@ const ItemUsage: React.FC<ItemUsageProps> = ({
   const handleDragMove = useCallback((event: MouseEvent | TouchEvent) => {
     if (!dragState.isDragging) return;
 
-    const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX;
-    const clientY = 'touches' in event ? event.touches[0].clientY : event.clientY;
+    const clientX = 'touches' in event ? event.touches[0]?.clientX || 0 : event.clientX;
+    const clientY = 'touches' in event ? event.touches[0]?.clientY || 0 : event.clientY;
 
     const newOffset = {
       x: clientX - dragState.dragStartPosition.x,
@@ -184,8 +185,8 @@ const ItemUsage: React.FC<ItemUsageProps> = ({
   const handleDragEnd = useCallback((event: MouseEvent | TouchEvent) => {
     if (!dragState.isDragging || !targetRef.current) return;
 
-    const clientX = 'touches' in event ? event.changedTouches[0].clientX : event.clientX;
-    const clientY = 'touches' in event ? event.changedTouches[0].clientY : event.clientY;
+    const clientX = 'touches' in event ? event.changedTouches[0]?.clientX || 0 : event.clientX;
+    const clientY = 'touches' in event ? event.changedTouches[0]?.clientY || 0 : event.clientY;
 
     // Check if dropped on target
     const targetRect = targetRef.current.getBoundingClientRect();

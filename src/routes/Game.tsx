@@ -4,7 +4,7 @@ import { Home, Settings, Pause, Play, Package, User, Users, BookOpen, Menu } fro
 import { Button, LoadingSpinner } from '../components/ui';
 import { Container } from '../components/layout';
 import { GameCanvas, TouchControls, GameUI } from '../components/game';
-import { SettingsMenu, MainMenu } from '../components/ui';
+import { SettingsMenu, MainMenu, OfflineStatus } from '../components/ui';
 import { Inventory, PlayerStatus, CompanionList, Tutorial, Onboarding } from '../components/game';
 import { useGameStore, useGameState, usePlayerState, useAnimalState, useUIState } from '../stores';
 import { MapManager, createMapManager, GameMap } from '../game';
@@ -129,18 +129,10 @@ const Game: React.FC = () => {
     }));
   }, []);
 
-  // Wrap addNotification to trace all calls
-  const tracedAddNotification = useCallback((notification: any) => {
-    console.log('🔔 addNotification called with:', notification);
-    console.trace('Call stack for addNotification:');
+  // Create stable notification function without debug logging
+  const stableAddNotification = useCallback((notification: any) => {
     addNotification(notification);
   }, [addNotification]);
-
-  // Create stable notification function
-  const stableAddNotification = useCallback((notification: any) => {
-    console.log('stableAddNotification called with:', notification);
-    tracedAddNotification(notification);
-  }, [tracedAddNotification]);
 
   // Initialize game with map system (only run once)
   useEffect(() => {
@@ -220,42 +212,54 @@ const Game: React.FC = () => {
         // Set up animal spawner callbacks
         animalSpawner.setCallbacks({
           onAnimalSpawned: (animal) => {
-            console.log('Animal spawned:', animal.species, 'at', animal.position);
             addAnimal(animal);
-            stableAddNotification({
-              type: 'info',
-              title: `${animal.species.charAt(0).toUpperCase() + animal.species.slice(1)} spotted!`,
-              message: `A wild ${animal.species} has appeared nearby`,
-              duration: 3000
-            });
+            // Only show notifications for rare animals or first encounters
+            if (animal.behavior.rarity > 0.7 || !playerState.discoveredAnimals.includes(animal.species)) {
+              stableAddNotification({
+                type: 'info',
+                title: `${animal.species.charAt(0).toUpperCase() + animal.species.slice(1)} spotted!`,
+                message: `A wild ${animal.species} has appeared nearby`,
+                duration: 3000
+              });
+            }
           },
           onAnimalDespawned: (animalId) => {
-            console.log('Animal despawned:', animalId);
             removeAnimal(animalId);
           },
           onSpawnAttempt: (species, position, success) => {
-            console.log('Spawn attempt:', species, 'at', position, success ? 'succeeded' : 'failed');
+            // Only log failed spawn attempts in development
+            if (!success && process.env.NODE_ENV === 'development') {
+              console.warn('Spawn failed:', species, 'at', position);
+            }
           }
         });
         
         // Set up proximity detector callbacks
         proximityDetector.setCallbacks({
           onProximityEvent: (event) => {
-            console.log('Proximity event:', event.type, event.zone.name, event.animal.species);
+            // Only show awareness notifications for new animal species or special interactions
             if (event.type === 'enter' && event.zone.name === 'awareness') {
-              stableAddNotification({
-                type: 'info',
-                title: `${event.animal.species.charAt(0).toUpperCase() + event.animal.species.slice(1)} notices you`,
-                message: `The ${event.animal.species} is aware of your presence`,
-                duration: 2000
-              });
+              if (!playerState.discoveredAnimals.includes(event.animal.species) || event.animal.behavior.rarity > 0.8) {
+                stableAddNotification({
+                  type: 'info',
+                  title: `${event.animal.species.charAt(0).toUpperCase() + event.animal.species.slice(1)} notices you`,
+                  message: `The ${event.animal.species} is aware of your presence`,
+                  duration: 2000
+                });
+              }
             }
           },
           onInteractionOpportunity: (opportunity) => {
-            console.log('Interaction opportunity:', opportunity.interactionType, opportunity.animal.species);
+            // Only log in development mode
+            if (process.env.NODE_ENV === 'development') {
+              console.log('Interaction opportunity:', opportunity.interactionType, opportunity.animal.species);
+            }
           },
           onAnimalReaction: (animal, reaction) => {
-            console.log('Animal reaction:', animal.species, reaction);
+            // Only log significant reactions in development mode
+            if (process.env.NODE_ENV === 'development' && (reaction.includes('flee') || reaction.includes('approach'))) {
+              console.log('Animal reaction:', animal.species, reaction);
+            }
           }
         });
         
@@ -404,27 +408,36 @@ const Game: React.FC = () => {
   const handleMove = (direction: 'up' | 'down' | 'left' | 'right' | null) => {
     if (!direction || gameState.isPaused || !currentMap) return;
     
-    const currentPos = playerState.player.position;
-    let newPosition = { ...currentPos };
+    // Start from current target position (if moving) or current position (if stationary)
+    const startPos = playerState.movementTarget && playerState.isMoving 
+      ? playerState.movementTarget 
+      : playerState.player.position;
+    
+    let newPosition = { ...startPos };
     
     switch (direction) {
       case 'up':
-        newPosition.y = Math.max(0, currentPos.y - 1);
+        newPosition.y = Math.max(0, startPos.y - 1);
         break;
       case 'down':
-        newPosition.y = currentPos.y + 1;
+        newPosition.y = startPos.y + 1;
         break;
       case 'left':
-        newPosition.x = Math.max(0, currentPos.x - 1);
+        newPosition.x = Math.max(0, startPos.x - 1);
         break;
       case 'right':
-        newPosition.x = currentPos.x + 1;
+        newPosition.x = startPos.x + 1;
         break;
     }
     
-    // Validate the new position using the same logic as tap-to-move
+    // Don't move to same position
+    if (newPosition.x === startPos.x && newPosition.y === startPos.y) {
+      return;
+    }
+    
+    // Validate the new position
     if (!currentMap.isValidPosition(newPosition.x, newPosition.y)) {
-      tracedAddNotification({
+      stableAddNotification({
         type: 'warning',
         title: 'Invalid location',
         message: 'Cannot move outside map boundaries',
@@ -435,7 +448,7 @@ const Game: React.FC = () => {
     
     if (!currentMap.isWalkable(newPosition.x, newPosition.y)) {
       const tile = currentMap.getTile(newPosition.x, newPosition.y);
-      tracedAddNotification({
+      stableAddNotification({
         type: 'warning',
         title: 'Blocked path',
         message: `Cannot walk on ${tile?.terrainType || 'this terrain'}`,
@@ -444,7 +457,31 @@ const Game: React.FC = () => {
       return;
     }
     
-    movePlayer(newPosition);
+    // Create a safe path from current player position to the new target
+    const safePath = findSafePath(playerState.player.position, newPosition, currentMap);
+    
+    // Check if we could create a path to the target
+    if (safePath.length === 0) {
+      // No path found - target is unreachable
+      stableAddNotification({
+        type: 'warning',
+        title: 'Path blocked',
+        message: 'Cannot reach that location',
+        duration: 2000
+      });
+      return;
+    }
+    
+    // Set new movement target with updated path
+    setMovementTargetWithPath(newPosition, safePath);
+    
+    // Provide visual feedback for directional movement
+    stableAddNotification({
+      type: 'info',
+      title: `Moving ${direction}`,
+      message: `Target: (${newPosition.x}, ${newPosition.y})`,
+      duration: 1000
+    });
   };
 
   const handleCellTap = (gridX: number, gridY: number) => {
@@ -1000,6 +1037,9 @@ const Game: React.FC = () => {
         }}
         playerName={playerState.player.name}
       />
+
+      {/* Offline Status Indicator */}
+      <OfflineStatus position="top-right" />
     </div>
   );
 };

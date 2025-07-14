@@ -26,7 +26,6 @@ const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const [isPressed, setIsPressed] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
 
   // Animation hooks
   const bounceStyle = useBounce(isPressed, 1.05);
@@ -68,12 +67,10 @@ const Button: React.FC<ButtonProps> = ({
   const handleMouseUp = () => setIsPressed(false);
   
   const handleMouseEnter = () => {
-    setIsHovered(true);
     getAudioManager().playButtonHover();
   };
   
   const handleMouseLeave = () => {
-    setIsHovered(false);
     setIsPressed(false);
   };
 

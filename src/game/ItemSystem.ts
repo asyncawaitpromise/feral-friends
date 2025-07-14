@@ -105,6 +105,7 @@ export interface ItemUseResult {
   specialEvents: string[];
   itemConsumed: boolean;
   cooldownApplied: number; // seconds
+  criticalSuccess?: boolean; // For critical hits/successes
 }
 
 // Comprehensive item database

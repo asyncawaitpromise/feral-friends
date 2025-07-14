@@ -265,13 +265,13 @@ export const CompactAnimalInteraction: React.FC<CompactAnimalInteractionProps> =
   selectedZoneIndex,
   onSelectZone,
   onInteract,
-  onClose,
-  lastResult,
   className = ''
 }) => {
   if (zones.length === 0) return null;
 
   const selectedZone = zones[selectedZoneIndex];
+  if (!selectedZone) return null;
+  
   const animal = selectedZone.animal;
 
   return (
@@ -304,7 +304,7 @@ export const CompactAnimalInteraction: React.FC<CompactAnimalInteractionProps> =
 
         {/* Quick Actions */}
         <div className="flex space-x-2">
-          {selectedZone.availableInteractions.slice(0, 3).map((interaction) => (
+          {selectedZone?.availableInteractions.slice(0, 3).map((interaction) => (
             <Button
               key={interaction}
               variant="primary"
@@ -324,7 +324,7 @@ export const CompactAnimalInteraction: React.FC<CompactAnimalInteractionProps> =
 
         {/* Animal Name */}
         <div className="text-white text-sm text-center bg-black bg-opacity-70 rounded px-3 py-1">
-          {animal.species} • {Math.round(selectedZone.distance * 10) / 10}m
+          {animal.species} • {Math.round((selectedZone?.distance || 0) * 10) / 10}m
         </div>
       </div>
     </div>

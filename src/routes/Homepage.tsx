@@ -1,8 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, Zap, Users, Map } from 'react-feather';
+import { PWAInstall } from '../components/ui';
+import { usePWA } from '../services/PWAManager';
 
 const Homepage = () => {
+  const { canInstall, status } = usePWA();
+  const [showPWAInstall, setShowPWAInstall] = useState(false);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-blue-50">
       {/* Hero Section */}
@@ -31,6 +36,15 @@ const Homepage = () => {
           </div>
         </div>
       </section>
+
+      {/* PWA Install Prompt */}
+      {(canInstall || showPWAInstall) && !status.isInstalled && (
+        <section className="py-8 px-4">
+          <div className="max-w-md mx-auto">
+            <PWAInstall onDismiss={() => setShowPWAInstall(false)} />
+          </div>
+        </section>
+      )}
 
       {/* Game Features */}
       <section className="py-16 bg-white">

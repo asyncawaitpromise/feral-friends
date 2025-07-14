@@ -216,7 +216,7 @@ export const CompanionList: React.FC<CompanionListProps> = ({
   const renderCompanionCard = (companion: CompanionData) => {
     const isSelected = selectedCompanion?.id === companion.id;
     const speciesEmoji = SPECIES_EMOJIS[companion.type] || '🐾';
-    const personality = PERSONALITY_TRAITS[companion.personality] || PERSONALITY_TRAITS.friendly;
+    const personality = PERSONALITY_TRAITS[companion.personality] || PERSONALITY_TRAITS.friendly || { icon: '🐾', color: 'text-gray-500' };
 
     return (
       <div

@@ -33,7 +33,10 @@ export const randomBetween = (min: number, max: number): number => {
 };
 
 export const randomChoice = <T>(array: T[]): T => {
-  return array[Math.floor(Math.random() * array.length)];
+  if (array.length === 0) {
+    throw new Error('Cannot choose from empty array');
+  }
+  return array[Math.floor(Math.random() * array.length)]!;
 };
 
 // Storage utilities

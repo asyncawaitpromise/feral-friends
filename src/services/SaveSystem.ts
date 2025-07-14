@@ -100,7 +100,7 @@ export class SaveSystem {
   private config: SaveSystemConfig;
   private autoSaveTimer: number | null = null;
   private lastAutoSave: number = 0;
-  private currentPlayerData: PlayerSaveData | null = null;
+  private _currentPlayerData: PlayerSaveData | null = null;
 
   constructor(config: Partial<SaveSystemConfig> = {}) {
     this.config = {
@@ -149,7 +149,7 @@ export class SaveSystem {
       // Update slot metadata
       await this.updateSlotMetadata(slotId, saveData);
 
-      this.currentPlayerData = saveData;
+      this._currentPlayerData = saveData;
       console.log(`Game saved successfully to slot ${slotId}`);
       return true;
     } catch (error) {
@@ -188,7 +188,7 @@ export class SaveSystem {
         throw new Error('Invalid save data structure');
       }
 
-      this.currentPlayerData = playerData;
+      this._currentPlayerData = playerData;
       console.log(`Game loaded successfully from slot ${slotId}`);
       return playerData;
     } catch (error) {
@@ -481,7 +481,7 @@ export class SaveSystem {
 
       keys.forEach(key => localStorage.removeItem(key));
       
-      this.currentPlayerData = null;
+      this._currentPlayerData = null;
       this.stopAutoSave();
       
       console.log('All save data cleared');
@@ -494,7 +494,7 @@ export class SaveSystem {
 
   dispose(): void {
     this.stopAutoSave();
-    this.currentPlayerData = null;
+    this._currentPlayerData = null;
   }
 }
 

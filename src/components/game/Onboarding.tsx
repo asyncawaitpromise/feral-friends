@@ -2,13 +2,11 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { animated } from '@react-spring/web';
 import { 
   Play, 
-  ArrowRight, 
   Star, 
   Heart, 
   Users, 
   MapPin, 
   Package,
-  Settings,
   CheckCircle,
   SkipForward,
   Zap
@@ -214,7 +212,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({
         title: 'Welcome to Feral Friends!',
         description: 'Learn about your magical adventure',
         icon: <Star size={24} />,
-        tutorial: ONBOARDING_TUTORIALS.welcome,
+        ...(ONBOARDING_TUTORIALS.welcome && { tutorial: ONBOARDING_TUTORIALS.welcome }),
         completed: false,
         required: true
       },
@@ -223,7 +221,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({
         title: 'Movement & Controls',
         description: 'Learn how to navigate the world',
         icon: <MapPin size={24} />,
-        tutorial: ONBOARDING_TUTORIALS.movement,
+        ...(ONBOARDING_TUTORIALS.movement && { tutorial: ONBOARDING_TUTORIALS.movement }),
         completed: false,
         required: true
       },
@@ -232,7 +230,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({
         title: 'Meeting Animals',
         description: 'Learn to interact with wildlife',
         icon: <Users size={24} />,
-        tutorial: ONBOARDING_TUTORIALS.animals,
+        ...(ONBOARDING_TUTORIALS.animals && { tutorial: ONBOARDING_TUTORIALS.animals }),
         completed: false,
         required: true
       },
@@ -241,7 +239,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({
         title: 'Items & Inventory',
         description: 'Discover tools and treats',
         icon: <Package size={24} />,
-        tutorial: ONBOARDING_TUTORIALS.inventory,
+        ...(ONBOARDING_TUTORIALS.inventory && { tutorial: ONBOARDING_TUTORIALS.inventory }),
         completed: false,
         required: false
       }

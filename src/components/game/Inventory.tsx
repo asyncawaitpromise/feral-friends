@@ -8,14 +8,11 @@ import {
   X, 
   MoreVertical,
   Trash2,
-  Scissors,
-  Info,
-  Star
+  Scissors
 } from 'react-feather';
 import { useSlideIn, useFadeIn, useStagger } from '../../hooks/useAnimation';
 import { useSound } from '../../hooks/useAudio';
 import { 
-  InventoryItem, 
   InventorySlot, 
   getInventorySystem, 
   UseItemResult 
@@ -482,17 +479,17 @@ export const Inventory: React.FC<InventoryProps> = ({
             </div>
           ) : viewMode === 'grid' ? (
             <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-2">
-              {staggeredSlots((style, slot: InventorySlot, index) => (
+              {staggeredSlots((style, slot: InventorySlot) => (
                 <animated.div key={`${slot.index}-grid`} style={style}>
-                  {renderSlot(slot, index)}
+                  {renderSlot(slot, slot.index)}
                 </animated.div>
               ))}
             </div>
           ) : (
             <div className="space-y-2">
-              {staggeredSlots((style, slot: InventorySlot, index) => (
+              {staggeredSlots((style, slot: InventorySlot) => (
                 <animated.div key={`${slot.index}-list`} style={style}>
-                  {renderListItem(slot, index)}
+                  {renderListItem(slot, slot.index)}
                 </animated.div>
               ))}
             </div>
@@ -525,10 +522,13 @@ export const Inventory: React.FC<InventoryProps> = ({
                 )}
               </div>
               
-              {!readOnly && slots[selectedSlot].item!.usable && (
+              {!readOnly && slots[selectedSlot]?.item?.usable && (
                 <Button
                   variant="primary"
-                  onClick={() => handleUseItem(slots[selectedSlot])}
+                  onClick={() => {
+                    const slot = slots[selectedSlot];
+                    if (slot) handleUseItem(slot);
+                  }}
                 >
                   Use Item
                 </Button>

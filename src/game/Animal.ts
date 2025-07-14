@@ -3,7 +3,7 @@
 
 import { Position } from '../types/game';
 
-export type AnimalSpecies = 'rabbit' | 'bird' | 'squirrel' | 'fox' | 'deer' | 'butterfly' | 'frog' | 'turtle';
+export type AnimalSpecies = 'rabbit' | 'bird' | 'squirrel' | 'fox' | 'deer' | 'butterfly' | 'frog' | 'turtle' | 'owl' | 'hawk' | 'mouse' | 'raccoon' | 'bear' | 'wolf' | 'otter' | 'hedgehog' | 'bat';
 
 export type AnimalState = 
   | 'idle' 
@@ -13,7 +13,8 @@ export type AnimalState =
   | 'sleeping' 
   | 'feeding' 
   | 'curious' 
-  | 'hiding';
+  | 'hiding'
+  | 'alert';
 
 export type AnimalSize = 'tiny' | 'small' | 'medium' | 'large';
 
@@ -28,6 +29,7 @@ export interface AnimalStats {
   fear: number;
   curiosity: number;
   trust: number; // Player trust level
+  trustLevel: number; // Additional trust level property
 }
 
 export interface AnimalBehavior {
@@ -47,6 +49,7 @@ export interface AnimalVisual {
   pattern?: 'solid' | 'striped' | 'spotted' | 'gradient';
   animation: 'hop' | 'walk' | 'fly' | 'swim' | 'dart';
   emoteIcon?: string; // For showing emotions
+  emoji?: string; // Emoji representation
 }
 
 export interface AnimalAI {
@@ -70,6 +73,7 @@ export interface AnimalAI {
 export interface Animal {
   id: string;
   species: AnimalSpecies;
+  type: AnimalSpecies; // Add type property for compatibility
   name?: string; // Optional custom name
   position: Position;
   velocity: { x: number; y: number };
@@ -432,6 +436,384 @@ export const ANIMAL_TEMPLATES: Record<AnimalSpecies, Partial<Animal>> = {
         foodSpots: []
       }
     }
+  },
+
+  owl: {
+    species: 'owl',
+    stats: {
+      health: 35,
+      maxHealth: 35,
+      energy: 90,
+      maxEnergy: 90,
+      happiness: 65,
+      fear: 40,
+      curiosity: 85,
+      trust: 25
+    },
+    behavior: {
+      fleeDistance: 5,
+      returnDistance: 12,
+      wanderRadius: 8,
+      restDuration: 6000,
+      activityLevel: 0.8,
+      socialLevel: 0.3,
+      timeOfDay: 'night'
+    },
+    visual: {
+      color: '#8B4513', // Saddle brown
+      secondaryColor: '#F5F5DC', // Beige
+      size: 'medium',
+      pattern: 'spotted',
+      animation: 'fly'
+    },
+    ai: {
+      currentState: 'idle',
+      stateTimer: 0,
+      lastStateChange: 0,
+      pathToTarget: [],
+      homePosition: { x: 0, y: 0 },
+      memory: {
+        safeSpots: [],
+        dangerSpots: [],
+        foodSpots: []
+      }
+    }
+  },
+
+  hawk: {
+    species: 'hawk',
+    stats: {
+      health: 45,
+      maxHealth: 45,
+      energy: 95,
+      maxEnergy: 95,
+      happiness: 50,
+      fear: 25,
+      curiosity: 60,
+      trust: 15
+    },
+    behavior: {
+      fleeDistance: 8,
+      returnDistance: 20,
+      wanderRadius: 15,
+      restDuration: 4000,
+      activityLevel: 0.9,
+      socialLevel: 0.1,
+      timeOfDay: 'day'
+    },
+    visual: {
+      color: '#8B4513', // Dark brown
+      secondaryColor: '#D2691E', // Chocolate
+      size: 'medium',
+      pattern: 'striped',
+      animation: 'fly'
+    },
+    ai: {
+      currentState: 'wandering',
+      stateTimer: 0,
+      lastStateChange: 0,
+      pathToTarget: [],
+      homePosition: { x: 0, y: 0 },
+      memory: {
+        safeSpots: [],
+        dangerSpots: [],
+        foodSpots: []
+      }
+    }
+  },
+
+  mouse: {
+    species: 'mouse',
+    stats: {
+      health: 8,
+      maxHealth: 8,
+      energy: 70,
+      maxEnergy: 70,
+      happiness: 75,
+      fear: 85,
+      curiosity: 65,
+      trust: 40
+    },
+    behavior: {
+      fleeDistance: 2,
+      returnDistance: 4,
+      wanderRadius: 3,
+      restDuration: 2000,
+      activityLevel: 0.9,
+      socialLevel: 0.7,
+      timeOfDay: 'night'
+    },
+    visual: {
+      color: '#696969', // Dim gray
+      secondaryColor: '#D3D3D3', // Light gray
+      size: 'tiny',
+      pattern: 'solid',
+      animation: 'dart'
+    },
+    ai: {
+      currentState: 'hiding',
+      stateTimer: 0,
+      lastStateChange: 0,
+      pathToTarget: [],
+      homePosition: { x: 0, y: 0 },
+      memory: {
+        safeSpots: [],
+        dangerSpots: [],
+        foodSpots: []
+      }
+    }
+  },
+
+  raccoon: {
+    species: 'raccoon',
+    stats: {
+      health: 40,
+      maxHealth: 40,
+      energy: 80,
+      maxEnergy: 80,
+      happiness: 70,
+      fear: 30,
+      curiosity: 95,
+      trust: 35
+    },
+    behavior: {
+      fleeDistance: 3,
+      returnDistance: 8,
+      wanderRadius: 6,
+      restDuration: 3500,
+      activityLevel: 0.7,
+      socialLevel: 0.4,
+      timeOfDay: 'night'
+    },
+    visual: {
+      color: '#708090', // Slate gray
+      secondaryColor: '#000000', // Black (mask)
+      size: 'medium',
+      pattern: 'striped',
+      animation: 'walk'
+    },
+    ai: {
+      currentState: 'curious',
+      stateTimer: 0,
+      lastStateChange: 0,
+      pathToTarget: [],
+      homePosition: { x: 0, y: 0 },
+      memory: {
+        safeSpots: [],
+        dangerSpots: [],
+        foodSpots: []
+      }
+    }
+  },
+
+  bear: {
+    species: 'bear',
+    stats: {
+      health: 120,
+      maxHealth: 120,
+      energy: 50,
+      maxEnergy: 50,
+      happiness: 40,
+      fear: 10,
+      curiosity: 40,
+      trust: 5
+    },
+    behavior: {
+      fleeDistance: 10,
+      returnDistance: 25,
+      wanderRadius: 20,
+      restDuration: 8000,
+      activityLevel: 0.3,
+      socialLevel: 0.1,
+      timeOfDay: 'dawn'
+    },
+    visual: {
+      color: '#8B4513', // Saddle brown
+      secondaryColor: '#654321', // Dark brown
+      size: 'large',
+      pattern: 'solid',
+      animation: 'walk'
+    },
+    ai: {
+      currentState: 'wandering',
+      stateTimer: 0,
+      lastStateChange: 0,
+      pathToTarget: [],
+      homePosition: { x: 0, y: 0 },
+      memory: {
+        safeSpots: [],
+        dangerSpots: [],
+        foodSpots: []
+      }
+    }
+  },
+
+  wolf: {
+    species: 'wolf',
+    stats: {
+      health: 70,
+      maxHealth: 70,
+      energy: 80,
+      maxEnergy: 80,
+      happiness: 55,
+      fear: 20,
+      curiosity: 50,
+      trust: 8
+    },
+    behavior: {
+      fleeDistance: 8,
+      returnDistance: 18,
+      wanderRadius: 15,
+      restDuration: 5000,
+      activityLevel: 0.6,
+      socialLevel: 0.9, // Pack animal
+      timeOfDay: 'dusk'
+    },
+    visual: {
+      color: '#696969', // Dim gray
+      secondaryColor: '#FFFFFF', // White
+      size: 'large',
+      pattern: 'solid',
+      animation: 'walk'
+    },
+    ai: {
+      currentState: 'wandering',
+      stateTimer: 0,
+      lastStateChange: 0,
+      pathToTarget: [],
+      homePosition: { x: 0, y: 0 },
+      memory: {
+        safeSpots: [],
+        dangerSpots: [],
+        foodSpots: []
+      }
+    }
+  },
+
+  otter: {
+    species: 'otter',
+    stats: {
+      health: 30,
+      maxHealth: 30,
+      energy: 85,
+      maxEnergy: 85,
+      happiness: 95,
+      fear: 40,
+      curiosity: 80,
+      trust: 70
+    },
+    behavior: {
+      fleeDistance: 4,
+      returnDistance: 8,
+      wanderRadius: 6,
+      restDuration: 3000,
+      activityLevel: 0.8,
+      socialLevel: 0.8,
+      timeOfDay: 'day'
+    },
+    visual: {
+      color: '#8B4513', // Saddle brown
+      secondaryColor: '#DEB887', // Burlywood
+      size: 'medium',
+      pattern: 'solid',
+      animation: 'swim'
+    },
+    ai: {
+      currentState: 'wandering',
+      stateTimer: 0,
+      lastStateChange: 0,
+      pathToTarget: [],
+      homePosition: { x: 0, y: 0 },
+      memory: {
+        safeSpots: [],
+        dangerSpots: [],
+        foodSpots: []
+      }
+    }
+  },
+
+  hedgehog: {
+    species: 'hedgehog',
+    stats: {
+      health: 25,
+      maxHealth: 25,
+      energy: 60,
+      maxEnergy: 60,
+      happiness: 60,
+      fear: 60,
+      curiosity: 45,
+      trust: 45
+    },
+    behavior: {
+      fleeDistance: 2,
+      returnDistance: 5,
+      wanderRadius: 3,
+      restDuration: 4000,
+      activityLevel: 0.5,
+      socialLevel: 0.2,
+      timeOfDay: 'night'
+    },
+    visual: {
+      color: '#8B4513', // Saddle brown
+      secondaryColor: '#F5DEB3', // Wheat
+      size: 'small',
+      pattern: 'spotted',
+      animation: 'walk'
+    },
+    ai: {
+      currentState: 'idle',
+      stateTimer: 0,
+      lastStateChange: 0,
+      pathToTarget: [],
+      homePosition: { x: 0, y: 0 },
+      memory: {
+        safeSpots: [],
+        dangerSpots: [],
+        foodSpots: []
+      }
+    }
+  },
+
+  bat: {
+    species: 'bat',
+    stats: {
+      health: 12,
+      maxHealth: 12,
+      energy: 100,
+      maxEnergy: 100,
+      happiness: 65,
+      fear: 75,
+      curiosity: 70,
+      trust: 30
+    },
+    behavior: {
+      fleeDistance: 4,
+      returnDistance: 10,
+      wanderRadius: 8,
+      restDuration: 1000,
+      activityLevel: 0.95,
+      socialLevel: 0.6,
+      timeOfDay: 'night'
+    },
+    visual: {
+      color: '#2F4F4F', // Dark slate gray
+      secondaryColor: '#696969', // Dim gray
+      size: 'tiny',
+      pattern: 'solid',
+      animation: 'fly'
+    },
+    ai: {
+      currentState: 'wandering',
+      stateTimer: 0,
+      lastStateChange: 0,
+      pathToTarget: [],
+      homePosition: { x: 0, y: 0 },
+      memory: {
+        safeSpots: [],
+        dangerSpots: [],
+        foodSpots: []
+      }
+    }
   }
 };
 
@@ -454,6 +836,7 @@ export function createAnimal(
   return {
     id,
     species,
+    type: species, // Set type same as species for compatibility
     position: { ...position },
     velocity: { x: 0, y: 0 },
     isActive: true,
@@ -463,7 +846,10 @@ export function createAnimal(
     interactionCount: 0,
     
     // Apply template with overrides
-    stats: { ...template.stats! },
+    stats: { 
+      ...template.stats!,
+      trustLevel: template.stats?.trust || 0 // Set trustLevel from trust
+    },
     behavior: { ...template.behavior! },
     visual: { ...template.visual! },
     ai: {
@@ -566,7 +952,47 @@ export function getRandomWanderPosition(animal: Animal): Position {
  */
 export function shouldFleeFromPlayer(animal: Animal, playerPosition: Position): boolean {
   const distance = getDistanceToPlayer(animal, playerPosition);
-  return distance <= animal.behavior.fleeDistance && animal.stats.fear > 30;
+  
+  // More nuanced fleeing logic based on trust and interaction attempts
+  const fleeThreshold = animal.behavior.fleeDistance * 0.5; // Animals now only flee at half their flee distance
+  const fearThreshold = Math.max(50, 80 - (animal.stats.trust * 0.5)); // Higher trust = less likely to flee
+  
+  // Check if player is moving too quickly towards animal
+  const playerMoving = animal.ai.memory.lastPlayerPosition ? 
+    getDistanceToPosition({ position: playerPosition } as Animal, animal.ai.memory.lastPlayerPosition) > 0.5 : false;
+  
+  // If player is approaching slowly and animal has some trust, don't flee immediately
+  if (animal.stats.trust > 20 && !playerMoving) {
+    return false;
+  }
+  
+  return distance <= fleeThreshold && animal.stats.fear > fearThreshold;
+}
+
+/**
+ * Check if animal should be cautious/alert (before fleeing)
+ */
+export function shouldBeAlert(animal: Animal, playerPosition: Position): boolean {
+  const distance = getDistanceToPlayer(animal, playerPosition);
+  const alertDistance = animal.behavior.fleeDistance * 1.5; // Alert at 1.5x flee distance
+  
+  // Animal becomes alert when player approaches but before fleeing
+  return distance <= alertDistance && distance > (animal.behavior.fleeDistance * 0.5) && animal.stats.fear > 30;
+}
+
+/**
+ * Check if animal is comfortable with player proximity for interaction
+ */
+export function canInteractWithPlayer(animal: Animal, playerPosition: Position): boolean {
+  const distance = getDistanceToPlayer(animal, playerPosition);
+  const interactionDistance = Math.max(2, animal.behavior.fleeDistance * 0.8); // Can interact at 80% of flee distance
+  
+  // Check if conditions are right for interaction
+  const lowFear = animal.stats.fear < 60;
+  const someTrust = animal.stats.trust > 10;
+  const goodDistance = distance <= interactionDistance && distance > 0.5; // Not too close, not too far
+  
+  return lowFear && someTrust && goodDistance;
 }
 
 /**
@@ -622,18 +1048,6 @@ export function updateAnimalMemory(animal: Animal, position: Position, type: 'sa
   }
 }
 
-/**
- * Check if animal can interact with player
- */
-export function canInteractWithPlayer(animal: Animal, playerPosition: Position): boolean {
-  const distance = getDistanceToPlayer(animal, playerPosition);
-  const maxInteractionDistance = 2;
-  
-  return distance <= maxInteractionDistance && 
-         animal.stats.fear < 70 && 
-         animal.ai.currentState !== 'fleeing' &&
-         animal.ai.currentState !== 'hiding';
-}
 
 /**
  * Get animal's current emotion based on stats
@@ -688,7 +1102,16 @@ export function isPositionSuitableForSpecies(
     deer: ['forest', 'meadow', 'temperate'],
     butterfly: ['meadow', 'flower', 'temperate'],
     frog: ['water', 'swamp', 'temperate'],
-    turtle: ['water', 'swamp', 'temperate']
+    turtle: ['water', 'swamp', 'temperate'],
+    owl: ['forest', 'mountain', 'temperate'],
+    hawk: ['mountain', 'forest', 'temperate'],
+    mouse: ['grassland', 'forest', 'temperate'],
+    raccoon: ['forest', 'water', 'temperate'],
+    bear: ['forest', 'mountain', 'temperate'],
+    wolf: ['forest', 'mountain', 'temperate'],
+    otter: ['water', 'river', 'temperate'],
+    hedgehog: ['forest', 'grassland', 'temperate'],
+    bat: ['cave', 'forest', 'temperate']
   };
   
   return preferences[species]?.includes(biome) || false;
@@ -703,10 +1126,11 @@ export default {
   moveTowardsTarget,
   getRandomWanderPosition,
   shouldFleeFromPlayer,
+  shouldBeAlert,
+  canInteractWithPlayer,
   shouldReturnHome,
   getFleePosition,
   updateAnimalMemory,
-  canInteractWithPlayer,
   getAnimalEmotion,
   getAnimalsBySpecies,
   getAnimalsInRadius,

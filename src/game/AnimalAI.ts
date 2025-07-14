@@ -11,6 +11,8 @@ import {
   moveTowardsTarget,
   getRandomWanderPosition,
   shouldFleeFromPlayer,
+  shouldBeAlert,
+  canInteractWithPlayer,
   shouldReturnHome,
   getFleePosition,
   updateAnimalMemory,
@@ -46,7 +48,8 @@ export class AnimalAI {
     feeding: { min: 5, max: 15 },    // 5-15 turns
     sleeping: { min: 8, max: 20 },  // 8-20 turns
     curious: { min: 2, max: 6 },    // 2-6 turns
-    hiding: { min: 4, max: 15 }     // 4-15 turns
+    hiding: { min: 4, max: 15 },    // 4-15 turns
+    alert: { min: 2, max: 5 }       // 2-5 turns
   };
 
   // Track turns instead of time for each animal
@@ -60,7 +63,8 @@ export class AnimalAI {
     feeding: 0.2,
     sleeping: 0,
     curious: 0.3,
-    hiding: 0.1
+    hiding: 0.1,
+    alert: 0.1
   };
 
   /**
@@ -106,7 +110,12 @@ export class AnimalAI {
     const currentState = animal.ai.currentState;
     
     // Emergency state changes (override normal duration) - more conservative for turn-based
-    if (shouldFleeFromPlayer(animal, context.playerPosition) && currentState !== 'fleeing' && animal.stats.fear > 70) {
+    if (shouldFleeFromPlayer(animal, context.playerPosition) && currentState !== 'fleeing') {
+      return true;
+    }
+
+    // Alert state change when player approaches
+    if (shouldBeAlert(animal, context.playerPosition) && currentState !== 'alert' && currentState !== 'fleeing') {
       return true;
     }
 
@@ -142,22 +151,27 @@ export class AnimalAI {
       return 'fleeing';
     }
 
-    // 2. Important: Return home if too far away
+    // 2. Alert: Be cautious if player is approaching
+    if (shouldBeAlert(animal, context.playerPosition)) {
+      return 'alert';
+    }
+
+    // 3. Important: Return home if too far away
     if (shouldReturnHome(animal)) {
       return 'returning';
     }
 
-    // 3. Energy-based states
+    // 4. Energy-based states
     if (animal.stats.energy < 30) {
       return Math.random() < 0.7 ? 'sleeping' : 'idle';
     }
 
-    // 4. Happiness-based states
+    // 5. Happiness-based states
     if (animal.stats.happiness > 80 && Math.random() < 0.3) {
       return 'feeding';
     }
 
-    // 5. Curiosity-based states
+    // 6. Curiosity-based states
     if (animal.stats.curiosity > 60 && Math.random() < 0.4) {
       const playerDistance = getDistanceToPlayer(animal, context.playerPosition);
       if (playerDistance > animal.behavior.fleeDistance && playerDistance < 8) {
@@ -165,7 +179,7 @@ export class AnimalAI {
       }
     }
 
-    // 6. Default behavior based on activity level
+    // 7. Default behavior based on activity level
     const activityRoll = Math.random();
     if (activityRoll < animal.behavior.activityLevel * 0.7) {
       return 'wandering';
@@ -204,6 +218,15 @@ export class AnimalAI {
         const fleeTarget = getFleePosition(animal, context.playerPosition);
         setAnimalTarget(animal, fleeTarget);
         updateAnimalMemory(animal, context.playerPosition, 'danger');
+        break;
+
+      case 'alert':
+        // Stop movement and clear target when becoming alert
+        animal.velocity.x = 0;
+        animal.velocity.y = 0;
+        animal.ai.targetPosition = undefined;
+        // Remember player position but not as danger (yet)
+        animal.ai.memory.lastPlayerPosition = { ...context.playerPosition };
         break;
 
       case 'returning':
@@ -312,6 +335,28 @@ export class AnimalAI {
           // Mark this as a safe spot after successful flee
           updateAnimalMemory(animal, animal.position, 'safe');
           result.memoryUpdated = true;
+        }
+        break;
+
+      case 'alert':
+        // Alert animals stand still and watch the player
+        animal.velocity.x = 0;
+        animal.velocity.y = 0;
+        animal.ai.targetPosition = undefined;
+        
+        // Face towards player
+        const playerDirection = getDistanceToPlayer(animal, context.playerPosition);
+        
+        // If player gets too close while alert, flee immediately
+        if (shouldFleeFromPlayer(animal, context.playerPosition)) {
+          result.feedbackMessage = `${animal.species} decides to flee!`;
+        } else if (canInteractWithPlayer(animal, context.playerPosition)) {
+          // If conditions are right for interaction, show positive feedback
+          result.feedbackMessage = `${animal.species} seems calm and watchful`;
+          // Slightly reduce fear over time if player isn't threatening
+          animal.stats.fear = Math.max(0, animal.stats.fear - 1);
+        } else {
+          result.feedbackMessage = `${animal.species} is alert and watching you carefully`;
         }
         break;
 

@@ -56,11 +56,17 @@ export const DialogueBox: React.FC<DialogueBoxProps> = ({
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-bold text-amber-800 flex items-center gap-2">
               <span className="text-2xl">
-                {dialogueState.currentAnimal.type === 'cat' && '🐱'}
-                {dialogueState.currentAnimal.type === 'dog' && '🐕'}
                 {dialogueState.currentAnimal.type === 'rabbit' && '🐰'}
+                {dialogueState.currentAnimal.type === 'fox' && '🦊'}
+                {dialogueState.currentAnimal.type === 'deer' && '🦌'}
+                {dialogueState.currentAnimal.type === 'bear' && '🐻'}
+                {dialogueState.currentAnimal.type === 'wolf' && '🐺'}
+                {dialogueState.currentAnimal.type === 'bird' && '🐦'}
+                {dialogueState.currentAnimal.type === 'owl' && '🦉'}
+                {dialogueState.currentAnimal.type === 'squirrel' && '🐿️'}
+                {!['rabbit', 'fox', 'deer', 'bear', 'wolf', 'bird', 'owl', 'squirrel'].includes(dialogueState.currentAnimal.type) && '🐾'}
               </span>
-              Talking with {dialogueState.currentAnimal.type}
+              Talking with {dialogueState.currentAnimal.species}
             </h3>
             <button
               onClick={onClose}

@@ -10,7 +10,7 @@ import {
   Package,
   Users
 } from 'react-feather';
-import { useBounce, useFadeIn, useSlideIn } from '../../hooks/useAnimation';
+import { useBounce, useSlideIn } from '../../hooks/useAnimation';
 import { useSound } from '../../hooks/useAudio';
 
 export interface HelpContext {
@@ -215,14 +215,12 @@ export const ContextualHelp: React.FC<ContextualHelpProps> = ({
   const [shownTips, setShownTips] = useState<Record<string, number>>({});
   const [lastShownTimes, setLastShownTimes] = useState<Record<string, number>>({});
   const [isHighlighting, setIsHighlighting] = useState(false);
-  const [helpButtonVisible, setHelpButtonVisible] = useState(true);
   
   const checkInterval = useRef<number>();
   const { playSuccess, playButtonClick } = useSound();
 
   // Animation hooks
   const bounceStyle = useBounce(isHighlighting, 1.1);
-  const fadeInStyle = useFadeIn(!!activeTip);
   const slideInStyle = useSlideIn(!!activeTip, 'up');
 
   // Load shown tips from localStorage
@@ -286,15 +284,17 @@ export const ContextualHelp: React.FC<ContextualHelpProps> = ({
         switch (trigger.type) {
           case 'time_in_area':
             return context.timeInArea >= (trigger.threshold || 0);
-          case 'action_performed':
+          case 'action_performed': {
             const actionCount = context.recentActions.filter(a => a === trigger.target).length;
             return actionCount >= (trigger.threshold || 1);
+          }
           case 'lack_of_progress':
             return context.timeInArea > (trigger.threshold || 60000) && 
                    context.currentObjectives.length > 0;
-          case 'repeated_failure':
+          case 'repeated_failure': {
             const failureCount = context.strugglingIndicators.filter(s => s === trigger.target).length;
             return failureCount >= (trigger.threshold || 1);
+          }
           case 'specific_context':
             return context.currentObjectives.includes(trigger.target || '');
           default:
@@ -477,7 +477,7 @@ export const ContextualHelp: React.FC<ContextualHelpProps> = ({
   };
 
   const renderHelpButton = () => {
-    if (!isVisible || !helpButtonVisible) return null;
+    if (!isVisible) return null;
 
     return (
       <animated.button

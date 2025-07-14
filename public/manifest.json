@@ -1,0 +1,170 @@
+{
+  "name": "Feral Friends",
+  "short_name": "Feral Friends",
+  "description": "Discover, befriend, and train wild animals in this charming mobile adventure game",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f9fafb",
+  "theme_color": "#059669",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["games", "entertainment", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96", 
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/gameplay-1.png",
+      "sizes": "640x1136",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Explore beautiful environments and discover wild animals"
+    },
+    {
+      "src": "/screenshots/gameplay-2.png", 
+      "sizes": "640x1136",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Build trust and bond with your animal friends"
+    },
+    {
+      "src": "/screenshots/gameplay-3.png",
+      "sizes": "640x1136", 
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Teach tricks and show off in competitions"
+    }
+  ],
+  "features": [
+    "offline",
+    "background-sync",
+    "persistent-storage"
+  ],
+  "edge_side_panel": {
+    "preferred_width": 480
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+feralfriends",
+      "url": "/?action=%s"
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url",
+      "files": [
+        {
+          "name": "save_file",
+          "accept": ["application/json", ".json"]
+        }
+      ]
+    }
+  },
+  "shortcuts": [
+    {
+      "name": "Continue Game",
+      "short_name": "Continue",
+      "description": "Resume your current adventure",
+      "url": "/game?action=continue",
+      "icons": [
+        {
+          "src": "/icons/shortcut-continue.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "New Game",
+      "short_name": "New Game", 
+      "description": "Start a fresh adventure",
+      "url": "/game?action=new",
+      "icons": [
+        {
+          "src": "/icons/shortcut-new.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Settings",
+      "short_name": "Settings",
+      "description": "Adjust game settings",
+      "url": "/settings",
+      "icons": [
+        {
+          "src": "/icons/shortcut-settings.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "handle_links": "preferred",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "file_handlers": [
+    {
+      "action": "/import",
+      "accept": {
+        "application/json": [".json"],
+        "application/x-feralfriends-save": [".ffsave"]
+      }
+    }
+  ]
+}

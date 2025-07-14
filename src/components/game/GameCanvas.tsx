@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { TILE_SIZE, TARGET_FPS } from '../../constants';
-import { Animal, getAnimalEmotion } from '../../game/Animal';
+import { TILE_SIZE } from '../../constants';
+import { Animal } from '../../game/Animal';
 import { DialogueBox } from './DialogueBox';
 import { dialogueSystem } from '../../game/DialogueSystem';
 import { useGameStore } from '../../stores/gameStore';
@@ -35,8 +35,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
   movementPath = [],
   showGrid = true,
   currentMap = null,
-  animals = [],
-  onAnimalClick
+  animals = []
 }) => {
   const dialogueState = useGameStore((state) => state.uiState.dialogueState);
   const setDialogueState = useGameStore((state) => state.setDialogueState);
@@ -255,8 +254,10 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
       // Touch event - only handle touchend, not touchstart
       if (event.type !== 'touchend') return;
       if (event.changedTouches.length === 0) return;
-      clientX = event.changedTouches[0].clientX;
-      clientY = event.changedTouches[0].clientY;
+      const touch = event.changedTouches[0];
+      if (!touch) return;
+      clientX = touch.clientX;
+      clientY = touch.clientY;
     } else {
       // Mouse event - only handle click, not mousedown/mouseup
       if (event.type !== 'click') return;
@@ -316,7 +317,7 @@ const GameCanvas: React.FC<GameCanvasProps> = ({
         const screenY = (y * TILE_SIZE) - camera.y;
         const terrainType = tile.terrainType || tile.type || 'grass';
         
-        ctx.fillStyle = terrainColors[terrainType] || terrainColors.grass;
+        ctx.fillStyle = terrainColors[terrainType] || terrainColors.grass || '#90EE90';
         ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
         
         // Add simple visual variations

@@ -341,6 +341,10 @@ export const useGameStore = create<GameStore>()(
           
           // Get next position in path
           const nextPosition = movementPath[0];
+          if (!nextPosition) {
+            return false; // No valid position to move to
+          }
+          
           const remainingPath = movementPath.slice(1);
           
           set((state) => ({
