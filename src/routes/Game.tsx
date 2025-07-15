@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, Settings, Pause, Play, Package, User, Users, BookOpen, Menu } from 'react-feather';
+import { Home, Settings, Pause, Play, Package, User, Users, BookOpen, Menu, Award, Target, Heart, Save, Activity } from 'react-feather';
 import { Button, LoadingSpinner } from '../components/ui';
 import { Container } from '../components/layout';
 import { GameCanvas, TouchControls, GameUI } from '../components/game';
-import { SettingsMenu, MainMenu, OfflineStatus } from '../components/ui';
-import { Inventory, PlayerStatus, CompanionList, Tutorial, Onboarding, TutorialMenu } from '../components/game';
+import { SettingsMenu, MainMenu, OfflineStatus, SaveSlots, DataManager } from '../components/ui';
+import { Inventory, PlayerStatus, CompanionList, Tutorial, Onboarding, TutorialMenu, TamingInterface, TrickTeaching, ItemUsage } from '../components/game';
 import { COMPREHENSIVE_TUTORIALS } from '../components/game/ComprehensiveTutorials';
 import { useGameStore, useGameState, usePlayerState, useAnimalState, useUIState } from '../stores';
 import { MapManager, createMapManager, GameMap } from '../game';
@@ -38,6 +38,12 @@ const Game: React.FC = () => {
   const [showTutorialMenu, setShowTutorialMenu] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showGameMenu, setShowGameMenu] = useState(false);
+  const [showSaveSlots, setShowSaveSlots] = useState(false);
+  const [showDataManager, setShowDataManager] = useState(false);
+  const [showTamingInterface, setShowTamingInterface] = useState(false);
+  const [showTrickTeaching, setShowTrickTeaching] = useState(false);
+  const [showItemUsage, setShowItemUsage] = useState(false);
+  const [showAchievements, setShowAchievements] = useState(false);
   const [currentTutorial, setCurrentTutorial] = useState<string | null>(null);
   const [completedTutorials, setCompletedTutorials] = useState<string[]>([]);
   
@@ -707,7 +713,7 @@ const Game: React.FC = () => {
             }}
           />
           
-          {/* Quick Access UI Buttons */}
+          {/* Quick Access UI Buttons - Left Panel */}
           <div className="absolute top-20 left-4 flex flex-col gap-2 z-40">
             <Button
               variant="primary"
@@ -744,6 +750,55 @@ const Game: React.FC = () => {
               leftIcon={<BookOpen size={16} />}
             >
               Tutorials
+            </Button>
+          </div>
+
+          {/* Game Features Panel - Right Side */}
+          <div className="absolute top-20 right-4 flex flex-col gap-2 z-40">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setShowAchievements(true)}
+              className="shadow-lg bg-yellow-500 hover:bg-yellow-600 text-white"
+              leftIcon={<Award size={16} />}
+            >
+              Achievements
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowTrickTeaching(true)}
+              className="shadow-lg bg-green-500 hover:bg-green-600 text-white"
+              leftIcon={<Target size={16} />}
+            >
+              Tricks
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowTamingInterface(true)}
+              className="shadow-lg bg-pink-500 hover:bg-pink-600 text-white"
+              leftIcon={<Heart size={16} />}
+            >
+              Taming
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setShowSaveSlots(true)}
+              className="shadow-lg bg-purple-500 hover:bg-purple-600"
+              leftIcon={<Save size={16} />}
+            >
+              Save/Load
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setShowItemUsage(true)}
+              className="shadow-lg bg-orange-500 hover:bg-orange-600 text-white"
+              leftIcon={<Activity size={16} />}
+            >
+              Use Items
             </Button>
           </div>
           
@@ -1053,6 +1108,106 @@ const Game: React.FC = () => {
         playerName={playerState.player.name}
         playerLevel={playerState.player.level}
       />
+
+      {/* Save/Load System */}
+      <SaveSlots
+        isOpen={showSaveSlots}
+        onClose={() => setShowSaveSlots(false)}
+        onLoadSave={(slotId: number, saveData) => {
+          console.log('Loading game from slot:', slotId, saveData);
+          setShowSaveSlots(false);
+        }}
+        onNewGame={() => {
+          console.log('Starting new game');
+          setShowSaveSlots(false);
+        }}
+      />
+
+      {/* Data Management */}
+      <DataManager
+        isOpen={showDataManager}
+        onClose={() => setShowDataManager(false)}
+      />
+
+      {/* Taming Interface */}
+      {showTamingInterface && animalState.animals.length > 0 && (
+        <TamingInterface
+          animal={animalState.animals[0]}
+          playerItems={[]}
+          playerEnergy={100}
+          onInteraction={(interactionId: string) => {
+            console.log('Taming interaction:', interactionId);
+          }}
+          onClose={() => setShowTamingInterface(false)}
+          isVisible={showTamingInterface}
+        />
+      )}
+
+      {/* Trick Teaching */}
+      {showTrickTeaching && animalState.animals.length > 0 && (
+        <TrickTeaching
+          animal={animalState.animals[0]}
+          trickId="sit"
+          onComplete={(success: boolean) => {
+            console.log('Trick teaching completed:', success);
+            setShowTrickTeaching(false);
+          }}
+          onClose={() => setShowTrickTeaching(false)}
+          isVisible={showTrickTeaching}
+        />
+      )}
+
+      {/* Item Usage Interface */}
+      <ItemUsage
+        visible={showItemUsage}
+        onClose={() => setShowItemUsage(false)}
+        targetAnimal={animalState.animals.length > 0 ? animalState.animals[0] : undefined}
+        selectedItem={undefined}
+        onItemUsed={(result) => {
+          console.log('Item used with result:', result);
+          if (result.itemConsumed) {
+            setShowItemUsage(false);
+          }
+        }}
+      />
+
+      {/* Achievements Panel - Create a simple modal for now */}
+      {showAchievements && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                <Award className="w-5 h-5 text-yellow-500" />
+                Achievements
+              </h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowAchievements(false)}
+              >
+                ×
+              </Button>
+            </div>
+            <div className="space-y-4">
+              <div className="p-3 bg-yellow-50 rounded border-l-4 border-yellow-400">
+                <h3 className="font-medium text-yellow-800">First Friend</h3>
+                <p className="text-sm text-yellow-600">Tame your first animal companion</p>
+                <div className="text-xs text-yellow-500 mt-1">Progress: 0/1</div>
+              </div>
+              <div className="p-3 bg-blue-50 rounded border-l-4 border-blue-400">
+                <h3 className="font-medium text-blue-800">Explorer</h3>
+                <p className="text-sm text-blue-600">Visit all map areas</p>
+                <div className="text-xs text-blue-500 mt-1">Progress: 1/5</div>
+              </div>
+              <div className="p-3 bg-green-50 rounded border-l-4 border-green-400">
+                <h3 className="font-medium text-green-800">Trick Master</h3>
+                <p className="text-sm text-green-600">Teach 10 different tricks</p>
+                <div className="text-xs text-green-500 mt-1">Progress: 0/10</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Offline Status Indicator */}
       <OfflineStatus position="top-right" />
