@@ -5,7 +5,8 @@ import { Button, LoadingSpinner } from '../components/ui';
 import { Container } from '../components/layout';
 import { GameCanvas, TouchControls, GameUI } from '../components/game';
 import { SettingsMenu, MainMenu, OfflineStatus } from '../components/ui';
-import { Inventory, PlayerStatus, CompanionList, Tutorial, Onboarding } from '../components/game';
+import { Inventory, PlayerStatus, CompanionList, Tutorial, Onboarding, TutorialMenu } from '../components/game';
+import { COMPREHENSIVE_TUTORIALS } from '../components/game/ComprehensiveTutorials';
 import { useGameStore, useGameState, usePlayerState, useAnimalState, useUIState } from '../stores';
 import { MapManager, createMapManager, GameMap } from '../game';
 import { MAP_REGISTRY, DEFAULT_MAP_ID } from '../data/maps';
@@ -34,8 +35,11 @@ const Game: React.FC = () => {
   const [showPlayerStatus, setShowPlayerStatus] = useState(false);
   const [showCompanionList, setShowCompanionList] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [showTutorialMenu, setShowTutorialMenu] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showGameMenu, setShowGameMenu] = useState(false);
+  const [currentTutorial, setCurrentTutorial] = useState<string | null>(null);
+  const [completedTutorials, setCompletedTutorials] = useState<string[]>([]);
   
   // Map system refs
   const mapManagerRef = useRef<MapManager | null>(null);
@@ -133,6 +137,21 @@ const Game: React.FC = () => {
   const stableAddNotification = useCallback((notification: any) => {
     addNotification(notification);
   }, [addNotification]);
+
+  // Load completed tutorials on mount
+  useEffect(() => {
+    const loadCompletedTutorials = () => {
+      const completed: string[] = [];
+      Object.keys(COMPREHENSIVE_TUTORIALS).forEach(tutorialId => {
+        if (localStorage.getItem(`tutorial-${tutorialId}-completed`) === 'true') {
+          completed.push(tutorialId);
+        }
+      });
+      setCompletedTutorials(completed);
+    };
+
+    loadCompletedTutorials();
+  }, []);
 
   // Initialize game with map system (only run once)
   useEffect(() => {
@@ -720,11 +739,11 @@ const Game: React.FC = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setShowTutorial(true)}
+              onClick={() => setShowTutorialMenu(true)}
               className="shadow-lg bg-white bg-opacity-80"
               leftIcon={<BookOpen size={16} />}
             >
-              Help
+              Tutorials
             </Button>
           </div>
           
@@ -991,50 +1010,48 @@ const Game: React.FC = () => {
       <Tutorial
         isOpen={showTutorial}
         onClose={() => setShowTutorial(false)}
-        currentTutorial={{
-          id: 'basic_controls',
-          title: 'Basic Controls',
-          description: 'Learn the basic game controls',
-          category: 'basic',
-          steps: [
-            {
-              id: 'welcome',
-              title: 'Welcome!',
-              content: 'Welcome to Feral Friends! This tutorial will teach you the basics.',
-              type: 'info',
-              skipable: true,
-              actionRequired: false
-            },
-            {
-              id: 'movement',
-              title: 'Movement',
-              content: 'Tap anywhere on the screen to move your character to that location.',
-              type: 'demonstration',
-              targetElement: '.game-canvas',
-              skipable: true,
-              actionRequired: false
-            }
-          ]
-        }}
+        currentTutorial={currentTutorial ? COMPREHENSIVE_TUTORIALS[currentTutorial] : null}
         onComplete={(tutorialId) => {
           console.log('Tutorial completed:', tutorialId);
+          setCompletedTutorials(prev => [...prev, tutorialId]);
+          localStorage.setItem(`tutorial-${tutorialId}-completed`, 'true');
           setShowTutorial(false);
+          setCurrentTutorial(null);
         }}
-        onSkip={() => setShowTutorial(false)}
-        completedTutorials={[]}
+        onSkip={() => {
+          setShowTutorial(false);
+          setCurrentTutorial(null);
+        }}
+        completedTutorials={completedTutorials}
+      />
+
+      <TutorialMenu
+        isOpen={showTutorialMenu}
+        onClose={() => setShowTutorialMenu(false)}
+        onSelectTutorial={(tutorialId) => {
+          setCurrentTutorial(tutorialId);
+          setShowTutorial(true);
+        }}
+        completedTutorials={completedTutorials}
+        playerLevel={playerState.player.level}
       />
 
       <Onboarding
         isOpen={showOnboarding}
         onComplete={() => {
           console.log('Onboarding completed');
+          setHasShownWelcome(true);
+          localStorage.setItem('feral-friends-welcome-shown', 'true');
           setShowOnboarding(false);
         }}
         onSkip={() => {
           console.log('Onboarding skipped');
+          setHasShownWelcome(true);
+          localStorage.setItem('feral-friends-welcome-shown', 'true');
           setShowOnboarding(false);
         }}
         playerName={playerState.player.name}
+        playerLevel={playerState.player.level}
       />
 
       {/* Offline Status Indicator */}
