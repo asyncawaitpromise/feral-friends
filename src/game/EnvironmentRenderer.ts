@@ -561,7 +561,7 @@ export class EnvironmentRenderer {
   }
 
   private shouldRenderShadow(object: MapObject): boolean {
-    return object.visual.zIndex > 1 && object.visual.size !== 'small';
+    return (object.visual.zIndex || 0) > 1 && object.visual.size !== 'small';
   }
 
   private renderObjectShadow(object: MapObject, context: RenderContext): void {

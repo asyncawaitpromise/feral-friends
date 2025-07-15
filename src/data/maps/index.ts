@@ -12,11 +12,11 @@ import caveEntranceData from './cave_entrance.json';
 
 // Map registry
 export const MAP_REGISTRY: Record<string, MapData> = {
-  starter_meadow: starterMeadowData as MapData,
-  forest_area: forestAreaData as MapData,
-  stream_area: streamAreaData as MapData,
-  rocky_hills: rockyHillsData as MapData,
-  cave_entrance: caveEntranceData as MapData,
+  starter_meadow: starterMeadowData as unknown as MapData,
+  forest_area: forestAreaData as unknown as MapData,
+  stream_area: streamAreaData as unknown as MapData,
+  rocky_hills: rockyHillsData as unknown as MapData,
+  cave_entrance: caveEntranceData as unknown as MapData,
 };
 
 // Map metadata for quick reference

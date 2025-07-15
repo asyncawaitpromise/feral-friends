@@ -555,8 +555,8 @@ export class GatheringSystem {
       if (resourceData) {
         resourceData.skillRequirements.forEach(skillReq => {
           const skill = this.gatheringSkills.get(skillReq.skill);
-          if (!skill || skill.level < skillReq.requirement) {
-            requirements.push(`${skillReq.skill} level ${skillReq.requirement} required`);
+          if (!skill || skill.level < skillReq.level) {
+            requirements.push(`${skillReq.skill} level ${skillReq.level} required`);
           }
         });
       }
@@ -973,7 +973,7 @@ export class GatheringSystem {
       hunting: 1.2
     };
 
-    return (baseTimes[difficulty] || 60) * (methodMultipliers[method] || 1.0);
+    return (baseTimes[difficulty as keyof typeof baseTimes] || 60) * (methodMultipliers[method] || 1.0);
   }
 
   private calculateGatheringTime(baseTime: number, tools: string[], companions: string[]): number {

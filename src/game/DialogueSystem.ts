@@ -1,4 +1,4 @@
-import { Animal } from './Animal';
+import { Animal, modifyTrust, modifyEnergy } from './Animal';
 
 export interface DialogueOption {
   id: string;
@@ -231,10 +231,10 @@ export class DialogueSystem {
 
   private applyEffects(animal: Animal, effects: DialogueOption['effect']): void {
     if (effects?.trust) {
-      animal.modifyTrust(effects.trust);
+      modifyTrust(animal, effects.trust);
     }
     if (effects?.energy) {
-      animal.modifyEnergy(effects.energy);
+      modifyEnergy(animal, effects.energy);
     }
   }
 

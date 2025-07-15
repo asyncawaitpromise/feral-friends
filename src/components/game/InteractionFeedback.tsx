@@ -52,7 +52,7 @@ const InteractionFeedback: React.FC<InteractionFeedbackProps> = ({
   const [isVisible, setIsVisible] = useState(false);
   const [animation, setAnimation] = useState<FeedbackAnimation>('bounce');
   const [particleEffects, setParticleEffects] = useState<Array<{ id: string; x: number; y: number; delay: number }>>([]);
-  const timeoutRef = useRef<number>();
+  const timeoutRef = useRef<NodeJS.Timeout>();
 
   // Show feedback when result changes
   useEffect(() => {

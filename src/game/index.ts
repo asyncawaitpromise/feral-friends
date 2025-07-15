@@ -9,7 +9,7 @@ export { InputManager, createInputManager } from './InputManager';
 export type { InputAction, InputEvent, InputState, TouchState, InputConfig } from './InputManager';
 
 export { Renderer, createRenderer } from './Renderer';
-export type { RendererConfig, Camera, RenderContext, Layer } from './Renderer';
+export type { RendererConfig, Camera, Layer } from './Renderer';
 
 export { Grid, createGrid } from './Grid';
 export type { TileType, Tile, GridConfig, GridBounds, TileVisualInfo } from './Grid';

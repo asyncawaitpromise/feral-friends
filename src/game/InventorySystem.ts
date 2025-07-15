@@ -16,7 +16,7 @@ export interface InventoryItem {
 }
 
 export interface ItemEffect {
-  type: 'heal' | 'energy' | 'trust' | 'happiness' | 'speed' | 'attraction' | 'special';
+  type: 'heal' | 'energy' | 'trust' | 'happiness' | 'speed' | 'attraction' | 'special' | 'health' | 'bond';
   value: number;
   duration?: number; // in seconds, for temporary effects
   target: 'player' | 'animal' | 'both';
@@ -444,7 +444,7 @@ export class InventorySystem {
   }
 
   // Private helper methods
-  private applyItemEffect(effect: ItemEffect, targetId?: string, context?: any): UseItemResult['effects'][0] | null {
+  private applyItemEffect(effect: ItemEffect, targetId?: string, context?: any): { type: string; oldValue: number; newValue: number; target: string; } | null {
     // This would integrate with the game's stat/entity system
     // For now, return a mock result
     return {

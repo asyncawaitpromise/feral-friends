@@ -214,7 +214,7 @@ const Game: React.FC = () => {
           onAnimalSpawned: (animal) => {
             addAnimal(animal);
             // Only show notifications for rare animals or first encounters
-            if (animal.behavior.rarity > 0.7 || !playerState.discoveredAnimals.includes(animal.species)) {
+            if ((animal.behavior.rarity || 0) > 0.7 || !playerState.discoveredAnimals.includes(animal.species)) {
               stableAddNotification({
                 type: 'info',
                 title: `${animal.species.charAt(0).toUpperCase() + animal.species.slice(1)} spotted!`,
@@ -239,7 +239,7 @@ const Game: React.FC = () => {
           onProximityEvent: (event) => {
             // Only show awareness notifications for new animal species or special interactions
             if (event.type === 'enter' && event.zone.name === 'awareness') {
-              if (!playerState.discoveredAnimals.includes(event.animal.species) || event.animal.behavior.rarity > 0.8) {
+              if (!playerState.discoveredAnimals.includes(event.animal.species) || (event.animal.behavior.rarity || 0) > 0.8) {
                 stableAddNotification({
                   type: 'info',
                   title: `${event.animal.species.charAt(0).toUpperCase() + event.animal.species.slice(1)} notices you`,
@@ -733,7 +733,7 @@ const Game: React.FC = () => {
             showDebugInfo={uiState.showDebugInfo}
             showGrid={uiState.showGrid}
             playerPosition={playerState.player.position}
-            currentTile={currentMap ? currentMap.getTile(playerState.player.position.x, playerState.player.position.y) : undefined}
+            currentTile={currentMap ? currentMap.getTile(playerState.player.position.x, playerState.player.position.y) || undefined : undefined}
             gameStats={{
               fps: 60, // This would come from the game loop
               entityCount: animalState.animals.filter(a => a.isActive).length,
@@ -939,7 +939,6 @@ const Game: React.FC = () => {
       />
 
       <PlayerStatus
-        isOpen={showPlayerStatus}
         playerName={playerState.player.name}
         stats={{
           level: 1,

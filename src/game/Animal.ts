@@ -40,6 +40,7 @@ export interface AnimalBehavior {
   activityLevel: number; // 0-1, how active they are
   socialLevel: number; // 0-1, how much they like other animals
   timeOfDay: 'day' | 'night' | 'dawn' | 'dusk' | 'any';
+  rarity?: number; // 0-1, how rare this animal is
 }
 
 export interface AnimalVisual {
@@ -67,6 +68,7 @@ export interface AnimalAI {
     safeSpots: Position[];
     dangerSpots: Position[];
     foodSpots: Position[];
+    lastPlayerPosition?: Position;
   };
 }
 
@@ -112,7 +114,8 @@ export const ANIMAL_TEMPLATES: Record<AnimalSpecies, Partial<Animal>> = {
       happiness: 70,
       fear: 45,
       curiosity: 60,
-      trust: 30
+      trust: 30,
+      trustLevel: 30
     },
     behavior: {
       fleeDistance: 3,
@@ -154,7 +157,8 @@ export const ANIMAL_TEMPLATES: Record<AnimalSpecies, Partial<Animal>> = {
       happiness: 80,
       fear: 55,
       curiosity: 90,
-      trust: 40
+      trust: 40,
+      trustLevel: 40
     },
     behavior: {
       fleeDistance: 4,
@@ -196,7 +200,8 @@ export const ANIMAL_TEMPLATES: Record<AnimalSpecies, Partial<Animal>> = {
       happiness: 75,
       fear: 35,
       curiosity: 85,
-      trust: 50
+      trust: 50,
+      trustLevel: 50
     },
     behavior: {
       fleeDistance: 2,
@@ -238,7 +243,8 @@ export const ANIMAL_TEMPLATES: Record<AnimalSpecies, Partial<Animal>> = {
       happiness: 60,
       fear: 30,
       curiosity: 70,
-      trust: 10
+      trust: 10,
+      trustLevel: 10
     },
     behavior: {
       fleeDistance: 5,
@@ -280,7 +286,8 @@ export const ANIMAL_TEMPLATES: Record<AnimalSpecies, Partial<Animal>> = {
       happiness: 50,
       fear: 70,
       curiosity: 30,
-      trust: 5
+      trust: 5,
+      trustLevel: 5
     },
     behavior: {
       fleeDistance: 6,
@@ -322,7 +329,8 @@ export const ANIMAL_TEMPLATES: Record<AnimalSpecies, Partial<Animal>> = {
       happiness: 90,
       fear: 65,
       curiosity: 75,
-      trust: 60
+      trust: 60,
+      trustLevel: 60
     },
     behavior: {
       fleeDistance: 1,
@@ -364,7 +372,8 @@ export const ANIMAL_TEMPLATES: Record<AnimalSpecies, Partial<Animal>> = {
       happiness: 60,
       fear: 70,
       curiosity: 50,
-      trust: 35
+      trust: 35,
+      trustLevel: 35
     },
     behavior: {
       fleeDistance: 2,
@@ -406,7 +415,8 @@ export const ANIMAL_TEMPLATES: Record<AnimalSpecies, Partial<Animal>> = {
       happiness: 40,
       fear: 20,
       curiosity: 20,
-      trust: 60
+      trust: 60,
+      trustLevel: 60
     },
     behavior: {
       fleeDistance: 1,
@@ -448,7 +458,8 @@ export const ANIMAL_TEMPLATES: Record<AnimalSpecies, Partial<Animal>> = {
       happiness: 65,
       fear: 40,
       curiosity: 85,
-      trust: 25
+      trust: 25,
+      trustLevel: 25
     },
     behavior: {
       fleeDistance: 5,
@@ -490,7 +501,8 @@ export const ANIMAL_TEMPLATES: Record<AnimalSpecies, Partial<Animal>> = {
       happiness: 50,
       fear: 25,
       curiosity: 60,
-      trust: 15
+      trust: 15,
+      trustLevel: 15
     },
     behavior: {
       fleeDistance: 8,
@@ -532,7 +544,8 @@ export const ANIMAL_TEMPLATES: Record<AnimalSpecies, Partial<Animal>> = {
       happiness: 75,
       fear: 85,
       curiosity: 65,
-      trust: 40
+      trust: 40,
+      trustLevel: 40
     },
     behavior: {
       fleeDistance: 2,
@@ -574,7 +587,8 @@ export const ANIMAL_TEMPLATES: Record<AnimalSpecies, Partial<Animal>> = {
       happiness: 70,
       fear: 30,
       curiosity: 95,
-      trust: 35
+      trust: 35,
+      trustLevel: 35
     },
     behavior: {
       fleeDistance: 3,
@@ -616,7 +630,8 @@ export const ANIMAL_TEMPLATES: Record<AnimalSpecies, Partial<Animal>> = {
       happiness: 40,
       fear: 10,
       curiosity: 40,
-      trust: 5
+      trust: 5,
+      trustLevel: 5
     },
     behavior: {
       fleeDistance: 10,
@@ -658,7 +673,8 @@ export const ANIMAL_TEMPLATES: Record<AnimalSpecies, Partial<Animal>> = {
       happiness: 55,
       fear: 20,
       curiosity: 50,
-      trust: 8
+      trust: 8,
+      trustLevel: 8
     },
     behavior: {
       fleeDistance: 8,
@@ -700,7 +716,8 @@ export const ANIMAL_TEMPLATES: Record<AnimalSpecies, Partial<Animal>> = {
       happiness: 95,
       fear: 40,
       curiosity: 80,
-      trust: 70
+      trust: 70,
+      trustLevel: 70
     },
     behavior: {
       fleeDistance: 4,
@@ -742,7 +759,8 @@ export const ANIMAL_TEMPLATES: Record<AnimalSpecies, Partial<Animal>> = {
       happiness: 60,
       fear: 60,
       curiosity: 45,
-      trust: 45
+      trust: 45,
+      trustLevel: 45
     },
     behavior: {
       fleeDistance: 2,
@@ -784,7 +802,8 @@ export const ANIMAL_TEMPLATES: Record<AnimalSpecies, Partial<Animal>> = {
       happiness: 65,
       fear: 75,
       curiosity: 70,
-      trust: 30
+      trust: 30,
+      trustLevel: 30
     },
     behavior: {
       fleeDistance: 4,
@@ -1117,6 +1136,20 @@ export function isPositionSuitableForSpecies(
   return preferences[species]?.includes(biome) || false;
 }
 
+/**
+ * Modify trust level of an animal
+ */
+export function modifyTrust(animal: Animal, amount: number): void {
+  animal.stats.trust = Math.max(0, Math.min(100, animal.stats.trust + amount));
+}
+
+/**
+ * Modify energy level of an animal
+ */
+export function modifyEnergy(animal: Animal, amount: number): void {
+  animal.stats.energy = Math.max(0, Math.min(animal.stats.maxEnergy, animal.stats.energy + amount));
+}
+
 export default {
   createAnimal,
   updateAnimalPosition,
@@ -1135,5 +1168,7 @@ export default {
   getAnimalsBySpecies,
   getAnimalsInRadius,
   isPositionSuitableForSpecies,
+  modifyTrust,
+  modifyEnergy,
   ANIMAL_TEMPLATES
 };

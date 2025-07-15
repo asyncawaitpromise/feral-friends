@@ -707,7 +707,7 @@ export class PerformanceSystem {
             animalId,
             typeof reward.value === 'number' ? reward.value : 0,
             'Performance reward',
-            'performance'
+            'play'
           );
           break;
         case 'unlock':

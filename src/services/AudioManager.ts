@@ -618,6 +618,25 @@ export class AudioManager {
       this.playError();
     }
   }
+
+  // Add missing methods for compatibility
+  registerSound(id: string, audioSource: AudioSource): void {
+    this.audioSources.set(id, audioSource);
+  }
+
+  stopSound(id: string): void {
+    const audio = this.activeAudio.get(id);
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+      this.activeAudio.delete(id);
+    }
+  }
+
+  isPlaying(id: string): boolean {
+    const audio = this.activeAudio.get(id);
+    return audio ? !audio.paused : false;
+  }
 }
 
 // Global audio manager instance

@@ -60,7 +60,7 @@ export const TrickTeaching: React.FC<TrickTeachingProps> = ({
 
   const gestureAreaRef = useRef<HTMLDivElement>(null);
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
-  const holdTimerRef = useRef<number | null>(null);
+  const holdTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const trick = getTrickById(trickId);
 

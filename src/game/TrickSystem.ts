@@ -379,7 +379,7 @@ export class TrickSystem {
     // Award bonding points for good performances
     if (performanceQuality > 0.7) {
       const bondPoints = Math.floor(performanceQuality * 10);
-      bondingSystem.addBondPoints(animalId, bondPoints, `Great performance of ${trick.name}`, 'performance');
+      bondingSystem.addBondPoints(animalId, bondPoints, `Great performance of ${trick.name}`, 'play');
     }
 
     this.callbacks.onPerformanceComplete?.(animalId, performance);
@@ -683,4 +683,9 @@ class GestureRecognitionSystem {
 }
 
 // Export singleton instance
-export const trickSystem = new TrickSystem(); 
+export const trickSystem = new TrickSystem();
+
+// Export convenience function
+export const getTrickMastery = (animalId: string, trickId: string): number => {
+  return trickSystem.getMasteryLevel(animalId, trickId);
+}; 

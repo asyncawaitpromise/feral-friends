@@ -107,7 +107,7 @@ export function useListTransition<T>(items: T[], keys?: (item: T) => string | nu
     enter: { opacity: 1, transform: 'scale(1) translate3d(0, 0, 0)' },
     leave: { opacity: 0, transform: 'scale(0.8) translate3d(0, -20px, 0)' },
     config: ANIMATION_CONFIGS.ui,
-    keys: keys || ((item: T, index: number) => index)
+    keys: keys || ((item: T) => String(items.indexOf(item)))
   });
 }
 

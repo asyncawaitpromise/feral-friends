@@ -1,7 +1,8 @@
 // Advanced Animal Behavior System
 // Handles pack animals, nocturnal behaviors, migration patterns, and complex social dynamics
 
-import { Animal, AnimalSpecies, Position, getDistanceToPosition, getAnimalsInRadius } from './Animal';
+import { Animal, AnimalSpecies, getDistanceToPosition, getAnimalsInRadius } from './Animal';
+import { Position } from '../types/game';
 
 export type TimeOfDay = 'dawn' | 'day' | 'dusk' | 'night';
 export type WeatherType = 'sunny' | 'rainy' | 'snowy' | 'foggy' | 'stormy';

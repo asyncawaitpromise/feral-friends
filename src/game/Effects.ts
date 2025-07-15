@@ -36,6 +36,7 @@ export interface EffectProperties {
   fadeOut?: boolean;
   pulse?: boolean;
   intensity?: number;
+  duration?: number;
   particles?: ParticleEffect[];
 }
 

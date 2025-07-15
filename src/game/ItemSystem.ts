@@ -836,7 +836,7 @@ export class ItemSystem {
       this.callbacks.onToolBroken?.(tool.id);
     }
 
-    const effects = success ? [...tool.effects] : [];
+    const effects = success && tool.effects ? [...tool.effects] : [];
     const experienceGained = success ? 10 : 3;
     const cooldown = tool.specialAbilities[0]?.cooldown || 0;
 
@@ -875,7 +875,7 @@ export class ItemSystem {
     const durabilityLoss = 3;
     toy.durability = Math.max(0, toy.durability - durabilityLoss);
 
-    const effects = success ? [...toy.effects] : [];
+    const effects = success && toy.effects ? [...toy.effects] : [];
     const experienceGained = success ? 15 : 5;
 
     return {

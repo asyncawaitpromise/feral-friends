@@ -163,7 +163,7 @@ export class GameMap {
         position: { x, y },
         walkable: this.terrainVisuals[tileData as TerrainType]?.walkable || false,
         terrainType: tileData as TerrainType
-      } as MapTile;
+      } as unknown as MapTile;
     }
     
     return tileData as MapTile;
