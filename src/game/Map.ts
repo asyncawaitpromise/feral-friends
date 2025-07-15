@@ -305,6 +305,14 @@ export class GameMap {
   }
   
   /**
+   * Get terrain type at specific position
+   */
+  public getTerrainAt(x: number, y: number): TerrainType | null {
+    const tile = this.getTile(x, y);
+    return tile ? tile.terrainType : null;
+  }
+
+  /**
    * Get terrain visual info
    */
   public getTerrainVisual(terrainType: TerrainType): any {

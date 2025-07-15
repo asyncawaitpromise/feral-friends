@@ -5,16 +5,19 @@ import { Button, LoadingSpinner } from '../components/ui';
 import { Container } from '../components/layout';
 import { GameCanvas, TouchControls, GameUI } from '../components/game';
 import { SettingsMenu, MainMenu, OfflineStatus, SaveSlots, DataManager } from '../components/ui';
-import { Inventory, PlayerStatus, CompanionList, Tutorial, Onboarding, TutorialMenu, TamingInterface, TrickTeaching, ItemUsage } from '../components/game';
+import { Inventory, PlayerStatus, CompanionList, Tutorial, Onboarding, TutorialMenu, TamingInterface, TrickTeaching, ItemUsage, EnhancedEncounterInterface } from '../components/game';
 import { COMPREHENSIVE_TUTORIALS } from '../components/game/ComprehensiveTutorials';
 import { useGameStore, useGameState, usePlayerState, useAnimalState, useUIState } from '../stores';
 import { MapManager, createMapManager, GameMap } from '../game';
 import { MAP_REGISTRY, DEFAULT_MAP_ID } from '../data/maps';
 import { Position } from '../types/game';
 import { Animal, createAnimal } from '../game/Animal';
-import { AnimalSpawner, createAnimalSpawner } from '../game/AnimalSpawner';
+// AnimalSpawner removed - using grass encounters only
 import { AnimalAI, createAIContext } from '../game/AnimalAI';
 import { ProximityDetector, createProximityDetector } from '../game/ProximityDetection';
+import { GrassEncounterSystem } from '../game/GrassEncounterSystem';
+import { EncounterAnimal } from '../game/EncounterAnimal';
+import HabitatSystem from '../game/HabitatSystem';
 
 const Game: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -44,6 +47,8 @@ const Game: React.FC = () => {
   const [showTrickTeaching, setShowTrickTeaching] = useState(false);
   const [showItemUsage, setShowItemUsage] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
+  const [showEncounterInterface, setShowEncounterInterface] = useState(false);
+  const [encounterAnimal, setEncounterAnimal] = useState<EncounterAnimal | null>(null);
   const [currentTutorial, setCurrentTutorial] = useState<string | null>(null);
   const [completedTutorials, setCompletedTutorials] = useState<string[]>([]);
   
@@ -51,8 +56,10 @@ const Game: React.FC = () => {
   const mapManagerRef = useRef<MapManager | null>(null);
   
   // Animal system refs
-  const animalSpawnerRef = useRef<AnimalSpawner | null>(null);
+  // animalSpawnerRef removed - using grass encounters only
   const proximityDetectorRef = useRef<ProximityDetector | null>(null);
+  const grassEncounterRef = useRef<GrassEncounterSystem | null>(null);
+  const habitatSystemRef = useRef<typeof HabitatSystem | null>(null);
   const gameLoopRef = useRef<number | null>(null);
   const lastFrameTimeRef = useRef<number>(0);
   
@@ -218,45 +225,21 @@ const Game: React.FC = () => {
         setCurrentMap(initialMap);
         setLoadingProgress(90);
         
-        // Initialize animal systems
-        setLoadingStage('Spawning animals...');
-        
-        // Create animal spawner
-        const animalSpawner = createAnimalSpawner({
-          enabled: true,
-          maxTotalAnimals: 8,
-          globalSpawnRate: 1.0,
-          despawnDistance: 20,
-          despawnTime: 120000,
-          playerProximityCheck: true
-        });
+        // Initialize encounter systems
+        setLoadingStage('Setting up encounters...');
         
         // Create proximity detector
         const proximityDetector = createProximityDetector();
-        
-        // Set up animal spawner callbacks
-        animalSpawner.setCallbacks({
-          onAnimalSpawned: (animal) => {
-            addAnimal(animal);
-            // Only show notifications for rare animals or first encounters
-            if ((animal.behavior.rarity || 0) > 0.7 || !playerState.discoveredAnimals.includes(animal.species)) {
-              stableAddNotification({
-                type: 'info',
-                title: `${animal.species.charAt(0).toUpperCase() + animal.species.slice(1)} spotted!`,
-                message: `A wild ${animal.species} has appeared nearby`,
-                duration: 3000
-              });
-            }
-          },
-          onAnimalDespawned: (animalId) => {
-            removeAnimal(animalId);
-          },
-          onSpawnAttempt: (species, position, success) => {
-            // Only log failed spawn attempts in development
-            if (!success && process.env.NODE_ENV === 'development') {
-              console.warn('Spawn failed:', species, 'at', position);
-            }
-          }
+
+        // Create habitat system (it's an object, not a class)
+        const habitatSystem = HabitatSystem;
+
+        // Create grass encounter system
+        const grassEncounter = new GrassEncounterSystem(initialMap, habitatSystem, {
+          encounterChance: 0.2, // 20% chance per grass step
+          minStepsInGrass: 2,
+          cooldownTime: 45000, // 45 seconds between encounters
+          maxEncountersPerArea: 1
         });
         
         // Set up proximity detector callbacks
@@ -287,27 +270,9 @@ const Game: React.FC = () => {
             }
           }
         });
-        
-        // Create spawn points for the map
-        const mapDimensions = initialMap.getDimensions();
-        animalSpawner.createSpawnPointsForMap(mapDimensions.width, mapDimensions.height, 'temperate');
-        
-        // Spawn initial animals
-        const initialAnimals: Animal[] = [];
-        const animalSpecies = ['rabbit', 'bird', 'squirrel', 'butterfly'] as const;
-        
-        for (let i = 0; i < 5; i++) {
-          const species = animalSpecies[Math.floor(Math.random() * animalSpecies.length)];
-          const x = 5 + Math.random() * (mapDimensions.width - 10);
-          const y = 5 + Math.random() * (mapDimensions.height - 10);
-          
-          const animal = createAnimal(`initial_${species}_${i}`, species, { x, y });
-          initialAnimals.push(animal);
-          addAnimal(animal);
-        }
-        
-        animalSpawnerRef.current = animalSpawner;
         proximityDetectorRef.current = proximityDetector;
+        grassEncounterRef.current = grassEncounter;
+        habitatSystemRef.current = habitatSystem;
         
         setLoadingProgress(95);
         
@@ -357,18 +322,14 @@ const Game: React.FC = () => {
 
   // Turn-based animal AI updates (triggered by player movement)
   useEffect(() => {
-    if (!gameInitialized || !animalSpawnerRef.current || !proximityDetectorRef.current) {
+    if (!gameInitialized || !proximityDetectorRef.current) {
       return;
     }
 
     const currentTime = Date.now();
-    const spawner = animalSpawnerRef.current;
     const proximityDetector = proximityDetectorRef.current;
 
     try {
-      // Update animal spawner (less frequently)
-      const newAnimals = spawner.update(playerState.player.position, currentTime);
-      
       // Update animal AI - this is now turn-based
       const activeAnimals = animalState.animals.filter(animal => animal.isActive);
       const aiContext = createAIContext(playerState.player.position, currentTime, 500); // Fixed delta for turn-based
@@ -389,6 +350,85 @@ const Game: React.FC = () => {
       console.error('Turn-based AI update error:', error);
     }
   }, [gameInitialized, playerState.player.position, animalState.animals, updateAnimal]); // Triggers on player position change
+
+  // Grass encounter callback
+  const handlePlayerMovement = useCallback((newPosition: Position, previousPosition: Position) => {
+    if (!grassEncounterRef.current || showEncounterInterface) {
+      return; // Don't trigger if already in encounter
+    }
+
+    const encounterAnimal = grassEncounterRef.current.checkForEncounter(newPosition, previousPosition);
+    if (encounterAnimal) {
+      setEncounterAnimal(encounterAnimal);
+      setShowEncounterInterface(true);
+      
+      // Add notification
+      addNotification({
+        type: 'info',
+        title: 'Wild Encounter!',
+        message: `A wild ${encounterAnimal.species} appears from the grass!`,
+        duration: 3000
+      });
+    }
+  }, [showEncounterInterface, addNotification]);
+
+  // Enhanced encounter action handlers
+  const handleAnimalTamed = useCallback((animal: Animal) => {
+    addAnimal(animal);
+    addNotification({
+      type: 'success',
+      title: 'Animal Tamed!',
+      message: `You successfully tamed the ${animal.species}!`,
+      duration: 3000
+    });
+    setShowEncounterInterface(false);
+    setEncounterAnimal(null);
+  }, [addAnimal, addNotification]);
+
+  const handleAnimalFled = useCallback(() => {
+    addNotification({
+      type: 'warning',
+      title: 'Animal Fled',
+      message: `The animal got too scared and ran away.`,
+      duration: 2500
+    });
+    setShowEncounterInterface(false);
+    setEncounterAnimal(null);
+  }, [addNotification]);
+
+  const handleEnergyUsed = useCallback((amount: number) => {
+    // TODO: Update player energy in store when energy system is implemented
+    console.log(`Used ${amount} energy`);
+  }, []);
+
+  const handleItemUsed = useCallback((itemId: string) => {
+    // TODO: Remove item from inventory when inventory system is implemented
+    console.log(`Used item: ${itemId}`);
+  }, []);
+
+  const handleEncounterFlee = useCallback(() => {
+    addNotification({
+      type: 'info',
+      title: 'You fled',
+      message: `You quietly backed away from the encounter.`,
+      duration: 2000
+    });
+    setShowEncounterInterface(false);
+    setEncounterAnimal(null);
+  }, [addNotification]);
+
+  // Watch for player position changes to trigger grass encounters
+  const previousPlayerPosition = useRef<Position>(playerState.player.position);
+  useEffect(() => {
+    const currentPosition = playerState.player.position;
+    const previousPosition = previousPlayerPosition.current;
+    
+    // Only trigger if position actually changed
+    if (currentPosition.x !== previousPosition.x || currentPosition.y !== previousPosition.y) {
+      handlePlayerMovement(currentPosition, previousPosition);
+      previousPlayerPosition.current = { ...currentPosition };
+    }
+  }, [playerState.player.position, handlePlayerMovement]);
 
   // Movement loop for tap-to-move functionality
   useEffect(() => {
@@ -1140,6 +1180,25 @@ const Game: React.FC = () => {
           }}
           onClose={() => setShowTamingInterface(false)}
           isVisible={showTamingInterface}
+        />
+      )}
+
+      {/* Enhanced Encounter Interface */}
+      {showEncounterInterface && encounterAnimal && (
+        <EnhancedEncounterInterface
+          animal={encounterAnimal}
+          playerItems={['food', 'water', 'toy']} // Placeholder items
+          playerEnergy={100}
+          onAnimalTamed={handleAnimalTamed}
+          onAnimalFled={handleAnimalFled}
+          onEnergyUsed={handleEnergyUsed}
+          onItemUsed={handleItemUsed}
+          onFlee={handleEncounterFlee}
+          onClose={() => {
+            setShowEncounterInterface(false);
+            setEncounterAnimal(null);
+          }}
+          isVisible={showEncounterInterface}
         />
       )}
 

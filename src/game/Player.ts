@@ -15,6 +15,7 @@ export interface PlayerConfig {
   minY?: number;
   grid?: Grid;
   snapToGrid?: boolean;
+  onMovement?: (newPosition: Position, previousPosition: Position) => void;
 }
 
 export interface PlayerSprite {
@@ -49,9 +50,10 @@ export interface PlayerState {
 
 export class Player {
   private state: PlayerState;
-  private readonly config: Required<Omit<PlayerConfig, 'grid' | 'snapToGrid'>> & { 
+  private readonly config: Required<Omit<PlayerConfig, 'grid' | 'snapToGrid' | 'onMovement'>> & { 
     grid?: Grid; 
-    snapToGrid: boolean; 
+    snapToGrid: boolean;
+    onMovement?: (newPosition: Position, previousPosition: Position) => void;
   };
   
   // Animation properties
@@ -74,6 +76,7 @@ export class Player {
       minY: config.minY ?? 0,
       grid: config.grid,
       snapToGrid: config.snapToGrid ?? true,
+      onMovement: config.onMovement,
     };
     
     this.grid = config.grid;
@@ -197,6 +200,11 @@ export class Player {
       this.state.movement.isMoving = false;
       this.state.movement.targetPosition = undefined;
       this.state.movement.direction = null;
+
+      // Trigger movement callback for instant movement
+      if (this.config.onMovement && typeof this.config.onMovement === 'function') {
+        this.config.onMovement(clampedPosition, this.state.previousPosition);
+      }
     }
     
     return true;
@@ -380,12 +388,20 @@ export class Player {
     
     if (this.state.movement.interpolationProgress >= 1) {
       // Movement complete
-      this.state.position = { ...this.state.movement.targetPosition };
+      const newPosition = { ...this.state.movement.targetPosition };
+      const previousPosition = { ...this.state.previousPosition };
+      
+      this.state.position = newPosition;
       this.state.movement.isMoving = false;
       this.state.movement.targetPosition = undefined;
       this.state.movement.direction = null;
       this.state.movement.interpolationProgress = 0;
       this.walkCycleOffset = 0;
+
+      // Trigger movement callback
+      if (this.config.onMovement && typeof this.config.onMovement === 'function') {
+        this.config.onMovement(newPosition, previousPosition);
+      }
     } else {
       // Update walk animation
       this.walkCycleOffset = Math.sin(this.animationTime * 0.015) * 2;
