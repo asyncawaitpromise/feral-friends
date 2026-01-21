@@ -44,6 +44,7 @@ export class CollisionSystem {
   
   // Collision cache for performance
   private collisionCache: Map<string, CollisionResult> = new Map();
+  private cacheTimeouts: Map<string, ReturnType<typeof setTimeout>> = new Map();
   private cacheMaxSize = 1000;
   private cacheTimeout = 5000; // 5 seconds
   
@@ -392,15 +393,32 @@ export class CollisionSystem {
     if (this.collisionCache.size >= this.cacheMaxSize) {
       // Remove oldest entries (simple approach)
       const keysToRemove = Array.from(this.collisionCache.keys()).slice(0, this.cacheMaxSize / 4);
-      keysToRemove.forEach(k => this.collisionCache.delete(k));
+      keysToRemove.forEach(k => {
+        // Clear timeout for removed keys
+        const timeout = this.cacheTimeouts.get(k);
+        if (timeout) {
+          clearTimeout(timeout);
+          this.cacheTimeouts.delete(k);
+        }
+        this.collisionCache.delete(k);
+      });
     }
-    
+
+    // Clear old timeout if exists
+    const oldTimeout = this.cacheTimeouts.get(key);
+    if (oldTimeout) {
+      clearTimeout(oldTimeout);
+    }
+
     this.collisionCache.set(key, result);
-    
-    // Set timeout to clear this cache entry
-    setTimeout(() => {
+
+    // Set new timeout to clear this cache entry
+    const timeout = setTimeout(() => {
       this.collisionCache.delete(key);
+      this.cacheTimeouts.delete(key);
     }, this.cacheTimeout);
+
+    this.cacheTimeouts.set(key, timeout);
   }
   
   /**

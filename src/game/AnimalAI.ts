@@ -55,6 +55,20 @@ export class AnimalAI {
   // Track turns instead of time for each animal
   private static animalTurnCounters: Map<string, number> = new Map();
 
+  /**
+   * Clear turn counter for a specific animal (prevents memory leak)
+   */
+  static clearAnimalTurnCounter(animalId: string): void {
+    this.animalTurnCounters.delete(animalId);
+  }
+
+  /**
+   * Clear all turn counters (useful for resetting the game)
+   */
+  static clearAllTurnCounters(): void {
+    this.animalTurnCounters.clear();
+  }
+
   private static readonly MOVEMENT_SPEEDS = {
     idle: 0,
     wandering: 0.5,

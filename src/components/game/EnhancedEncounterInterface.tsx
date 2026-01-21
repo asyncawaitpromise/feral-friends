@@ -131,10 +131,10 @@ export const EnhancedEncounterInterface: React.FC<EnhancedEncounterInterfaceProp
       onEnergyUsed(trick.energyCost);
       
       // Perform trick
-      const result: TrickResult = EncounterAnimalManager.performTrick(encounterAnimal, trick);
-      
+      const { animal: updatedAnimal, result } = EncounterAnimalManager.performTrick(encounterAnimal, trick);
+
       // Update local state
-      setEncounterAnimal({...encounterAnimal});
+      setEncounterAnimal(updatedAnimal);
       
       // Provide feedback
       if (result.criticalSuccess) {
@@ -175,10 +175,10 @@ export const EnhancedEncounterInterface: React.FC<EnhancedEncounterInterfaceProp
       }
       
       // Use taming method
-      const result: TamingResult = EncounterAnimalManager.useTamingMethod(encounterAnimal, method);
-      
+      const { animal: updatedAnimal, result } = EncounterAnimalManager.useTamingMethod(encounterAnimal, method);
+
       // Update local state
-      setEncounterAnimal({...encounterAnimal});
+      setEncounterAnimal(updatedAnimal);
       
       // Provide feedback
       if (result.bonusEffect) {

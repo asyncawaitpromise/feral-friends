@@ -27,7 +27,6 @@ const Game: React.FC = () => {
   const [loadingStage, setLoadingStage] = useState('Initializing...');
   const [hasShownWelcome, setHasShownWelcome] = useState(() => {
     const stored = localStorage.getItem('feral-friends-welcome-shown');
-    console.log('Initial hasShownWelcome state from localStorage:', stored);
     return stored === 'true';
   });
 
@@ -110,15 +109,12 @@ const Game: React.FC = () => {
         current = nextStep;
         path.push({ ...current });
       } else {
-        // If we can't move directly, try alternative routes
-        // For now, just stop pathfinding if we hit an obstacle
-        console.log('Pathfinding blocked at:', nextStep, 'stopping path creation');
+        // If we can't move directly, stop pathfinding
         break;
       }
-      
+
       // Safety check to prevent infinite loops
       if (path.length > 100) {
-        console.log('Pathfinding exceeded max steps, stopping');
         break;
       }
     }
@@ -168,13 +164,7 @@ const Game: React.FC = () => {
 
   // Initialize game with map system (only run once)
   useEffect(() => {
-    console.log('=== GAME INIT EFFECT ===');
-    console.log('Game component mounted/re-mounted. gameInitialized:', gameInitialized);
-    console.log('hasShownWelcome current state:', hasShownWelcome);
-    console.log('localStorage feral-friends-welcome-shown:', localStorage.getItem('feral-friends-welcome-shown'));
-    
     if (gameInitialized) {
-      console.log('Game already initialized, skipping init');
       return; // Prevent re-initialization
     }
     
@@ -202,7 +192,6 @@ const Game: React.FC = () => {
         // Set callbacks
         mapManager.setCallbacks({
           onMapLoaded: (mapId, map) => {
-            console.log(`Map loaded: ${mapId}`);
             if (mapId === DEFAULT_MAP_ID) {
               setCurrentMap(map);
             }
@@ -284,26 +273,17 @@ const Game: React.FC = () => {
         setGameInitialized(true);
         setLoadingProgress(100);
         startGame();
-        
+
         // Welcome notification (only show once)
-        console.log('=== WELCOME NOTIFICATION CHECK ===');
-        console.log('hasShownWelcome before check:', hasShownWelcome);
-        console.log('localStorage before check:', localStorage.getItem('feral-friends-welcome-shown'));
-        
         if (!hasShownWelcome) {
-          console.log('🎉 Showing welcome notification for the first time');
           stableAddNotification({
             type: 'success',
             title: 'Welcome to Feral Friends!',
             message: `You've arrived at the ${initialMap.getMetadata().displayName}`,
             duration: 4000
           });
-          console.log('Setting hasShownWelcome to true and updating localStorage');
           setHasShownWelcome(true);
           localStorage.setItem('feral-friends-welcome-shown', 'true');
-          console.log('localStorage after setting:', localStorage.getItem('feral-friends-welcome-shown'));
-        } else {
-          console.log('❌ Welcome notification already shown, skipping');
         }
         
       } catch (error) {
@@ -397,14 +377,46 @@ const Game: React.FC = () => {
   }, [addNotification]);
 
   const handleEnergyUsed = useCallback((amount: number) => {
-    // TODO: Update player energy in store when energy system is implemented
-    console.log(`Used ${amount} energy`);
-  }, []);
+    const { useEnergy } = useGameStore.getState();
+    const hadEnoughEnergy = useEnergy(amount);
+
+    if (!hadEnoughEnergy) {
+      addNotification({
+        type: 'warning',
+        title: 'Low Energy',
+        message: `Not enough energy! You need ${amount} but only have ${playerState.player.energy}.`,
+        duration: 3000
+      });
+    }
+
+    return hadEnoughEnergy;
+  }, [playerState.player.energy, addNotification]);
 
   const handleItemUsed = useCallback((itemId: string) => {
-    // TODO: Remove item from inventory when inventory system is implemented
-    console.log(`Used item: ${itemId}`);
-  }, []);
+    const { removeFromInventory } = useGameStore.getState();
+
+    // Check if item exists in inventory
+    const item = playerState.inventory.find((invItem: any) => invItem.id === itemId);
+
+    if (item) {
+      removeFromInventory(itemId);
+      addNotification({
+        type: 'success',
+        title: 'Item Used',
+        message: `Used ${item.name || itemId}`,
+        duration: 2000
+      });
+      return true;
+    } else {
+      addNotification({
+        type: 'error',
+        title: 'Item Not Found',
+        message: `You don't have ${itemId} in your inventory`,
+        duration: 2500
+      });
+      return false;
+    }
+  }, [playerState.inventory, addNotification]);
 
   const handleEncounterFlee = useCallback(() => {
     addNotification({
@@ -432,21 +444,13 @@ const Game: React.FC = () => {
 
   // Movement loop for tap-to-move functionality
   useEffect(() => {
-    console.log('=== MOVEMENT EFFECT ===');
-    console.log('playerState.isMoving:', playerState.isMoving);
-    console.log('gameState.isPaused:', gameState.isPaused);
-    
     if (!playerState.isMoving || gameState.isPaused) {
-      console.log('Movement effect returning early');
       return;
     }
 
-    console.log('Setting up movement interval');
     const moveInterval = setInterval(() => {
-      console.log('Movement interval tick');
       const isComplete = moveTowardsTarget();
       if (isComplete) {
-        console.log('Movement completed, showing destination reached notification');
         stableAddNotification({
           type: 'success',
           title: 'Destination reached!',
@@ -457,10 +461,9 @@ const Game: React.FC = () => {
     }, 500); // Move every 500ms for visible movement
 
     return () => {
-      console.log('Cleaning up movement interval');
       clearInterval(moveInterval);
     };
-  }, [playerState.isMoving, gameState.isPaused, moveTowardsTarget]);
+  }, [playerState.isMoving, gameState.isPaused]); // Removed moveTowardsTarget from dependencies
 
   const togglePause = () => {
     if (gameState.isPaused) {
@@ -539,30 +542,15 @@ const Game: React.FC = () => {
     
     // Set new movement target with updated path
     setMovementTargetWithPath(newPosition, safePath);
-    
-    // Provide visual feedback for directional movement
-    stableAddNotification({
-      type: 'info',
-      title: `Moving ${direction}`,
-      message: `Target: (${newPosition.x}, ${newPosition.y})`,
-      duration: 1000
-    });
   };
 
   const handleCellTap = (gridX: number, gridY: number) => {
-    console.log('=== CELL TAP ===');
-    console.log('Tapped cell:', gridX, gridY);
-    console.log('gameState.isPaused:', gameState.isPaused);
-    console.log('currentMap exists:', !!currentMap);
-    
     if (gameState.isPaused || !currentMap) {
-      console.log('Tap ignored - game paused or no map');
       return;
     }
     
     // Check if target position is valid on the current map
     if (!currentMap.isValidPosition(gridX, gridY)) {
-      console.log('Invalid position, showing warning notification');
       stableAddNotification({
         type: 'warning',
         title: 'Invalid location',
@@ -621,15 +609,6 @@ const Game: React.FC = () => {
     
     // Set movement target with safe path
     setMovementTargetWithPath({ x: gridX, y: gridY }, safePath);
-    
-    // Get current tile info for feedback
-    const targetTile = currentMap.getTile(gridX, gridY);
-    stableAddNotification({
-      type: 'info',
-      title: 'Moving to destination',
-      message: `Walking to ${targetTile?.terrainType || 'unknown'} at (${gridX}, ${gridY})`,
-      duration: 2000
-    });
   };
 
   const handleAction = (action: 'A' | 'B') => {
@@ -1055,11 +1034,11 @@ const Game: React.FC = () => {
       <PlayerStatus
         playerName={playerState.player.name}
         stats={{
-          level: 1,
-          experience: 150,
+          level: playerState.player.level,
+          experience: playerState.player.experience,
           experienceToNext: 200,
-          energy: 85,
-          maxEnergy: 100,
+          energy: playerState.player.energy,
+          maxEnergy: playerState.player.maxEnergy,
           health: 95,
           maxHealth: 100,
           totalPlayTime: 1800
@@ -1174,7 +1153,7 @@ const Game: React.FC = () => {
         <TamingInterface
           animal={animalState.animals[0]}
           playerItems={[]}
-          playerEnergy={100}
+          playerEnergy={playerState.player.energy}
           onInteraction={(interactionId: string) => {
             console.log('Taming interaction:', interactionId);
           }}
@@ -1188,7 +1167,7 @@ const Game: React.FC = () => {
         <EnhancedEncounterInterface
           animal={encounterAnimal}
           playerItems={['food', 'water', 'toy']} // Placeholder items
-          playerEnergy={100}
+          playerEnergy={playerState.player.energy}
           onAnimalTamed={handleAnimalTamed}
           onAnimalFled={handleAnimalFled}
           onEnergyUsed={handleEnergyUsed}
