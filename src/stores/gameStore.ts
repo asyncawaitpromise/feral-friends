@@ -225,7 +225,7 @@ const findPath = (start: Position, end: Position): Position[] => {
 export const useGameStore = create<GameStore>()(
   subscribeWithSelector(
     persist(
-      (set, get) => ({
+      (set, get): GameStore => ({
         // Initial states
         gameState: defaultGameState,
         playerState: defaultPlayerState,
@@ -235,7 +235,7 @@ export const useGameStore = create<GameStore>()(
 
         // Game Actions
         startGame: () => {
-          set((state) => ({
+          set((state: GameStore) => ({
             gameState: {
               ...state.gameState,
               isPlaying: true,
@@ -246,7 +246,7 @@ export const useGameStore = create<GameStore>()(
         },
 
         pauseGame: () => {
-          set((state) => ({
+          set((state: GameStore) => ({
             gameState: {
               ...state.gameState,
               isPaused: true
@@ -255,7 +255,7 @@ export const useGameStore = create<GameStore>()(
         },
 
         resumeGame: () => {
-          set((state) => ({
+          set((state: GameStore) => ({
             gameState: {
               ...state.gameState,
               isPaused: false
@@ -264,7 +264,7 @@ export const useGameStore = create<GameStore>()(
         },
 
         stopGame: () => {
-          set((state) => ({
+          set((state: GameStore) => ({
             gameState: {
               ...state.gameState,
               isPlaying: false,
@@ -274,7 +274,7 @@ export const useGameStore = create<GameStore>()(
         },
 
         setLoading: (loading: boolean) => {
-          set((state) => ({
+          set((state: GameStore) => ({
             gameState: {
               ...state.gameState,
               isLoading: loading
@@ -283,7 +283,7 @@ export const useGameStore = create<GameStore>()(
         },
 
         updateGameTime: (deltaTime: number) => {
-          set((state) => ({
+          set((state: GameStore) => ({
             gameState: {
               ...state.gameState,
               gameTime: state.gameState.gameTime + deltaTime
@@ -293,7 +293,7 @@ export const useGameStore = create<GameStore>()(
 
         // Player Actions
         movePlayer: (position: Position) => {
-          set((state) => ({
+          set((state: GameStore) => ({
             playerState: {
               ...state.playerState,
               player: {
@@ -318,7 +318,7 @@ export const useGameStore = create<GameStore>()(
           
           const path = findPath(currentPos, target);
           
-          set((state) => ({
+          set((state: GameStore) => ({
             playerState: {
               ...state.playerState,
               movementTarget: target,
@@ -329,7 +329,7 @@ export const useGameStore = create<GameStore>()(
         },
 
         clearMovementTarget: () => {
-          set((state) => ({
+          set((state: GameStore) => ({
             playerState: {
               ...state.playerState,
               movementTarget: null,
@@ -355,7 +355,7 @@ export const useGameStore = create<GameStore>()(
           
           const remainingPath = movementPath.slice(1);
           
-          set((state) => ({
+          set((state: GameStore) => ({
             playerState: {
               ...state.playerState,
               player: {
@@ -373,7 +373,7 @@ export const useGameStore = create<GameStore>()(
         },
 
         updatePlayerExp: (exp: number) => {
-          set((state) => {
+          set((state: GameStore) => {
             const newExp = state.playerState.player.experience + exp;
             const newLevel = Math.floor(newExp / 100) + 1;
 
@@ -393,7 +393,7 @@ export const useGameStore = create<GameStore>()(
         useEnergy: (amount: number) => {
           let hadEnoughEnergy = false;
 
-          set((state) => {
+          set((state: GameStore) => {
             const currentEnergy = state.playerState.player.energy;
 
             if (currentEnergy >= amount) {
@@ -417,7 +417,7 @@ export const useGameStore = create<GameStore>()(
         },
 
         restoreEnergy: (amount: number) => {
-          set((state) => ({
+          set((state: GameStore) => ({
             playerState: {
               ...state.playerState,
               player: {
@@ -429,7 +429,7 @@ export const useGameStore = create<GameStore>()(
         },
 
         setEnergy: (energy: number) => {
-          set((state) => ({
+          set((state: GameStore) => ({
             playerState: {
               ...state.playerState,
               player: {
@@ -441,7 +441,7 @@ export const useGameStore = create<GameStore>()(
         },
 
         addToInventory: (item: any) => {
-          set((state) => ({
+          set((state: GameStore) => ({
             playerState: {
               ...state.playerState,
               inventory: [...state.playerState.inventory, item]
@@ -450,16 +450,16 @@ export const useGameStore = create<GameStore>()(
         },
 
         removeFromInventory: (itemId: string) => {
-          set((state) => ({
+          set((state: GameStore) => ({
             playerState: {
               ...state.playerState,
-              inventory: state.playerState.inventory.filter(item => item.id !== itemId)
+              inventory: state.playerState.inventory.filter((item: any) => item.id !== itemId)
             }
           }));
         },
 
         addCompanion: (animal: any) => {
-          set((state) => ({
+          set((state: GameStore) => ({
             playerState: {
               ...state.playerState,
               companions: [...state.playerState.companions, animal]
@@ -468,7 +468,7 @@ export const useGameStore = create<GameStore>()(
         },
 
         discoverAnimal: (animalId: string) => {
-          set((state) => ({
+          set((state: GameStore) => ({
             playerState: {
               ...state.playerState,
               discoveredAnimals: [...new Set([...state.playerState.discoveredAnimals, animalId])]
@@ -477,7 +477,7 @@ export const useGameStore = create<GameStore>()(
         },
 
         unlockAchievement: (achievementId: string) => {
-          set((state) => ({
+          set((state: GameStore) => ({
             playerState: {
               ...state.playerState,
               achievements: [...new Set([...state.playerState.achievements, achievementId])]
@@ -487,7 +487,7 @@ export const useGameStore = create<GameStore>()(
 
         // Animal Actions
         addAnimal: (animal: Animal) => {
-          set((state) => ({
+          set((state: GameStore) => ({
             animalState: {
               ...state.animalState,
               animals: [...state.animalState.animals, animal],
@@ -500,19 +500,19 @@ export const useGameStore = create<GameStore>()(
           // Clean up AI turn counter to prevent memory leak
           AnimalAI.clearAnimalTurnCounter(animalId);
 
-          set((state) => ({
+          set((state: GameStore) => ({
             animalState: {
               ...state.animalState,
-              animals: state.animalState.animals.filter(animal => animal.id !== animalId)
+              animals: state.animalState.animals.filter((animal: Animal) => animal.id !== animalId)
             }
           }));
         },
 
         updateAnimal: (animalId: string, updates: Partial<Animal>) => {
-          set((state) => ({
+          set((state: GameStore) => ({
             animalState: {
               ...state.animalState,
-              animals: state.animalState.animals.map(animal => 
+              animals: state.animalState.animals.map((animal: Animal) =>
                 animal.id === animalId ? { ...animal, ...updates } : animal
               )
             }
@@ -523,7 +523,7 @@ export const useGameStore = create<GameStore>()(
           // Clean up all AI turn counters to prevent memory leak
           AnimalAI.clearAllTurnCounters();
 
-          set((state) => ({
+          set((state: GameStore) => ({
             animalState: {
               ...state.animalState,
               animals: [],
@@ -534,7 +534,7 @@ export const useGameStore = create<GameStore>()(
 
         // UI Actions
         openModal: (modalId: string) => {
-          set((state) => ({
+          set((state: GameStore) => ({
             uiState: {
               ...state.uiState,
               activeModal: modalId
@@ -543,7 +543,7 @@ export const useGameStore = create<GameStore>()(
         },
 
         closeModal: () => {
-          set((state) => ({
+          set((state: GameStore) => ({
             uiState: {
               ...state.uiState,
               activeModal: null
@@ -552,7 +552,7 @@ export const useGameStore = create<GameStore>()(
         },
 
         openMenu: (menuId: string) => {
-          set((state) => ({
+          set((state: GameStore) => ({
             uiState: {
               ...state.uiState,
               activeMenu: menuId
@@ -561,7 +561,7 @@ export const useGameStore = create<GameStore>()(
         },
 
         closeMenu: () => {
-          set((state) => ({
+          set((state: GameStore) => ({
             uiState: {
               ...state.uiState,
               activeMenu: null
@@ -570,7 +570,7 @@ export const useGameStore = create<GameStore>()(
         },
 
         toggleDebugInfo: () => {
-          set((state) => ({
+          set((state: GameStore) => ({
             uiState: {
               ...state.uiState,
               showDebugInfo: !state.uiState.showDebugInfo
@@ -579,7 +579,7 @@ export const useGameStore = create<GameStore>()(
         },
 
         toggleGrid: () => {
-          set((state) => ({
+          set((state: GameStore) => ({
             uiState: {
               ...state.uiState,
               showGrid: !state.uiState.showGrid
@@ -587,14 +587,14 @@ export const useGameStore = create<GameStore>()(
           }));
         },
 
-        addNotification: (notification) => {
+        addNotification: (notification: Omit<Notification, 'id' | 'timestamp'>) => {
           const newNotification: Notification = {
             ...notification,
             id: `notification_${Date.now()}_${Math.random()}`,
             timestamp: Date.now()
           };
-          
-          set((state) => ({
+
+          set((state: GameStore) => ({
             uiState: {
               ...state.uiState,
               notifications: [...state.uiState.notifications, newNotification]
@@ -606,7 +606,7 @@ export const useGameStore = create<GameStore>()(
             setTimeout(() => {
               // Check if notification still exists before removing
               const state = get();
-              const exists = state.uiState.notifications.some(n => n.id === newNotification.id);
+              const exists = state.uiState.notifications.some((n: Notification) => n.id === newNotification.id);
               if (exists) {
                 state.removeNotification(newNotification.id);
               }
@@ -615,17 +615,17 @@ export const useGameStore = create<GameStore>()(
         },
 
         removeNotification: (notificationId: string) => {
-          set((state) => ({
+          set((state: GameStore) => ({
             uiState: {
               ...state.uiState,
-              notifications: state.uiState.notifications.filter(n => n.id !== notificationId)
+              notifications: state.uiState.notifications.filter((n: Notification) => n.id !== notificationId)
             }
           }));
         },
 
         // Dialogue Actions
         setDialogueState: (dialogueState: DialogueState) => {
-          set((state) => ({
+          set((state: GameStore) => ({
             uiState: {
               ...state.uiState,
               dialogueState
@@ -634,7 +634,7 @@ export const useGameStore = create<GameStore>()(
         },
 
         clearDialogue: () => {
-          set((state) => ({
+          set((state: GameStore) => ({
             uiState: {
               ...state.uiState,
               dialogueState: {
@@ -650,7 +650,7 @@ export const useGameStore = create<GameStore>()(
 
         // Settings Actions
         updateSettings: (newSettings: Partial<Settings>) => {
-          set((state) => ({
+          set((state: GameStore) => ({
             settings: {
               ...state.settings,
               ...newSettings
@@ -666,7 +666,7 @@ export const useGameStore = create<GameStore>()(
 
         // Persistence Actions
         saveGame: () => {
-          set((state) => ({
+          set((state: GameStore) => ({
             gameState: {
               ...state.gameState,
               lastSaved: Date.now()
@@ -691,7 +691,7 @@ export const useGameStore = create<GameStore>()(
       {
         name: STORAGE_KEYS.GAME_SAVE,
         storage: createJSONStorage(() => localStorage),
-        partialize: (state) => ({
+        partialize: (state: GameStore) => ({
           gameState: state.gameState,
           playerState: state.playerState,
           animalState: state.animalState,
@@ -703,8 +703,8 @@ export const useGameStore = create<GameStore>()(
 );
 
 // Convenient selectors
-export const useGameState = () => useGameStore((state) => state.gameState);
-export const usePlayerState = () => useGameStore((state) => state.playerState);
-export const useAnimalState = () => useGameStore((state) => state.animalState);
-export const useUIState = () => useGameStore((state) => state.uiState);
-export const useSettings = () => useGameStore((state) => state.settings);
+export const useGameState = () => useGameStore((state: GameStore) => state.gameState);
+export const usePlayerState = () => useGameStore((state: GameStore) => state.playerState);
+export const useAnimalState = () => useGameStore((state: GameStore) => state.animalState);
+export const useUIState = () => useGameStore((state: GameStore) => state.uiState);
+export const useSettings = () => useGameStore((state: GameStore) => state.settings);

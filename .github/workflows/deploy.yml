@@ -2,10 +2,9 @@ name: Build & Deploy
 
 on:
   push:
-    branches: [ "main" ]
-
-  pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
+  # Only runs on commits to main/master (including merged PRs)
+  # Removed pull_request trigger to avoid running on every PR update
 
 jobs:
   build-and-deploy:
