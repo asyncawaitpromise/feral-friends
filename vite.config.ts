@@ -23,7 +23,6 @@ export default defineConfig({
             './src/game/Animal.ts',
             './src/game/AnimalAI.ts',
             './src/game/AnimalBehaviorSystem.ts',
-            './src/game/AnimalSpawner.ts',
             './src/game/TamingSystem.ts',
             './src/game/BondingSystem.ts'
           ],
