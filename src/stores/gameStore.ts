@@ -4,6 +4,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { STORAGE_KEYS } from '../constants';
 import { Animal } from '../game/Animal';
 import { DialogueState } from '../game/DialogueSystem';
+import { AnimalAI } from '../game/AnimalAI';
 
 // Types for game state
 interface Position {
@@ -17,6 +18,8 @@ interface Player {
   name: string;
   level: number;
   experience: number;
+  energy: number;
+  maxEnergy: number;
 }
 
 interface GameState {
@@ -95,6 +98,9 @@ interface GameStore {
   setMovementTarget: (target: Position) => void;
   clearMovementTarget: () => void;
   moveTowardsTarget: () => boolean; // Returns true if movement completed
+  useEnergy: (amount: number) => boolean; // Returns true if had enough energy
+  restoreEnergy: (amount: number) => void;
+  setEnergy: (energy: number) => void;
   updatePlayerExp: (exp: number) => void;
   addToInventory: (item: any) => void;
   removeFromInventory: (itemId: string) => void;
@@ -148,7 +154,9 @@ const defaultPlayerState: PlayerState = {
     position: { x: 10, y: 10 },
     name: 'Explorer',
     level: 1,
-    experience: 0
+    experience: 0,
+    energy: 100,
+    maxEnergy: 100
   },
   inventory: [],
   companions: [],
@@ -161,8 +169,8 @@ const defaultPlayerState: PlayerState = {
 
 const defaultUIState: UIState = {
   activeModal: null,
-  showDebugInfo: true, // Show in development
-  showGrid: true, // Show in development
+  showDebugInfo: false, // Disabled by default - can be toggled by user
+  showGrid: false, // Disabled by default - can be toggled by user
   activeMenu: null,
   notifications: [],
   dialogueState: {
@@ -368,7 +376,7 @@ export const useGameStore = create<GameStore>()(
           set((state) => {
             const newExp = state.playerState.player.experience + exp;
             const newLevel = Math.floor(newExp / 100) + 1;
-            
+
             return {
               playerState: {
                 ...state.playerState,
@@ -380,6 +388,56 @@ export const useGameStore = create<GameStore>()(
               }
             };
           });
+        },
+
+        useEnergy: (amount: number) => {
+          let hadEnoughEnergy = false;
+
+          set((state) => {
+            const currentEnergy = state.playerState.player.energy;
+
+            if (currentEnergy >= amount) {
+              hadEnoughEnergy = true;
+              return {
+                playerState: {
+                  ...state.playerState,
+                  player: {
+                    ...state.playerState.player,
+                    energy: Math.max(0, currentEnergy - amount)
+                  }
+                }
+              };
+            }
+
+            // Not enough energy, don't change state
+            return state;
+          });
+
+          return hadEnoughEnergy;
+        },
+
+        restoreEnergy: (amount: number) => {
+          set((state) => ({
+            playerState: {
+              ...state.playerState,
+              player: {
+                ...state.playerState.player,
+                energy: Math.min(state.playerState.player.maxEnergy, state.playerState.player.energy + amount)
+              }
+            }
+          }));
+        },
+
+        setEnergy: (energy: number) => {
+          set((state) => ({
+            playerState: {
+              ...state.playerState,
+              player: {
+                ...state.playerState.player,
+                energy: Math.max(0, Math.min(state.playerState.player.maxEnergy, energy))
+              }
+            }
+          }));
         },
 
         addToInventory: (item: any) => {
@@ -439,6 +497,9 @@ export const useGameStore = create<GameStore>()(
         },
 
         removeAnimal: (animalId: string) => {
+          // Clean up AI turn counter to prevent memory leak
+          AnimalAI.clearAnimalTurnCounter(animalId);
+
           set((state) => ({
             animalState: {
               ...state.animalState,
@@ -459,6 +520,9 @@ export const useGameStore = create<GameStore>()(
         },
 
         clearAllAnimals: () => {
+          // Clean up all AI turn counters to prevent memory leak
+          AnimalAI.clearAllTurnCounters();
+
           set((state) => ({
             animalState: {
               ...state.animalState,
@@ -540,7 +604,12 @@ export const useGameStore = create<GameStore>()(
           // Auto-remove notification after duration
           if (notification.duration) {
             setTimeout(() => {
-              get().removeNotification(newNotification.id);
+              // Check if notification still exists before removing
+              const state = get();
+              const exists = state.uiState.notifications.some(n => n.id === newNotification.id);
+              if (exists) {
+                state.removeNotification(newNotification.id);
+              }
             }, notification.duration);
           }
         },

@@ -125,8 +125,9 @@ export class EncounterAnimalManager {
 
   /**
    * Perform a trick on the encounter animal
+   * Returns updated animal and trick result
    */
-  static performTrick(animal: EncounterAnimal, trick: TrickDefinition): TrickResult {
+  static performTrick(animal: EncounterAnimal, trick: TrickDefinition): { animal: EncounterAnimal; result: TrickResult } {
     const fearBefore = animal.encounter.fear;
     const affectionBefore = animal.encounter.affection;
 
@@ -216,16 +217,10 @@ export class EncounterAnimalManager {
       }
     }
 
-    // Apply changes
-    animal.encounter.fear = Math.max(0, Math.min(100, animal.encounter.fear - fearReduction));
-    animal.encounter.affection = Math.max(0, Math.min(100, animal.encounter.affection + affectionGain));
-    animal.encounter.interactionCount++;
-    animal.encounter.lastInteraction = Date.now();
-
-    // Check if animal has been calmed
-    if (animal.encounter.fear < 30 && !animal.encounter.hasBeenCalmed) {
-      animal.encounter.hasBeenCalmed = true;
-    }
+    // Calculate new values without mutation
+    const newFear = Math.max(0, Math.min(100, animal.encounter.fear - fearReduction));
+    const newAffection = Math.max(0, Math.min(100, animal.encounter.affection + affectionGain));
+    const newHasBeenCalmed = animal.encounter.hasBeenCalmed || newFear < 30;
 
     // Record interaction
     const interaction: EncounterInteraction = {
@@ -234,9 +229,9 @@ export class EncounterAnimalManager {
       timestamp: Date.now(),
       success,
       fearBefore,
-      fearAfter: animal.encounter.fear,
+      fearAfter: newFear,
       affectionBefore,
-      affectionAfter: animal.encounter.affection,
+      affectionAfter: newAffection,
       details: {
         trickId: trick.id,
         effectiveness: finalEffectiveness,
@@ -244,9 +239,22 @@ export class EncounterAnimalManager {
         animalReaction
       }
     };
-    animal.encounter.interactions.push(interaction);
 
-    return {
+    // Create updated animal (immutable)
+    const updatedAnimal: EncounterAnimal = {
+      ...animal,
+      encounter: {
+        ...animal.encounter,
+        fear: newFear,
+        affection: newAffection,
+        interactionCount: animal.encounter.interactionCount + 1,
+        lastInteraction: Date.now(),
+        hasBeenCalmed: newHasBeenCalmed,
+        interactions: [...animal.encounter.interactions, interaction]
+      }
+    };
+
+    const result: TrickResult = {
       success,
       fearReduction,
       affectionGain,
@@ -256,12 +264,15 @@ export class EncounterAnimalManager {
       criticalSuccess,
       criticalFailure
     };
+
+    return { animal: updatedAnimal, result };
   }
 
   /**
    * Use a taming method on the encounter animal
+   * Returns updated animal and taming result
    */
-  static useTamingMethod(animal: EncounterAnimal, method: any): TamingResult {
+  static useTamingMethod(animal: EncounterAnimal, method: any): { animal: EncounterAnimal; result: TamingResult } {
     const fearBefore = animal.encounter.fear;
     const affectionBefore = animal.encounter.affection;
 
@@ -337,14 +348,10 @@ export class EncounterAnimalManager {
       }
     }
 
-    // Apply changes
-    animal.encounter.fear = Math.max(0, Math.min(100, animal.encounter.fear - fearReduction));
-    animal.encounter.affection = Math.max(0, Math.min(100, animal.encounter.affection + affectionGain));
-    animal.encounter.interactionCount++;
-    animal.encounter.lastInteraction = Date.now();
-
-    // Update taming progress
-    animal.encounter.tamingProgress = (animal.encounter.affection / animal.encounter.tameThreshold) * 100;
+    // Calculate new values without mutation
+    const newFear = Math.max(0, Math.min(100, animal.encounter.fear - fearReduction));
+    const newAffection = Math.max(0, Math.min(100, animal.encounter.affection + affectionGain));
+    const newTamingProgress = (newAffection / animal.encounter.tameThreshold) * 100;
 
     // Record interaction
     const interaction: EncounterInteraction = {
@@ -353,9 +360,9 @@ export class EncounterAnimalManager {
       timestamp: Date.now(),
       success,
       fearBefore,
-      fearAfter: animal.encounter.fear,
+      fearAfter: newFear,
       affectionBefore,
-      affectionAfter: animal.encounter.affection,
+      affectionAfter: newAffection,
       details: {
         methodId: method.id,
         effectiveness,
@@ -363,9 +370,22 @@ export class EncounterAnimalManager {
         animalReaction
       }
     };
-    animal.encounter.interactions.push(interaction);
 
-    return {
+    // Create updated animal (immutable)
+    const updatedAnimal: EncounterAnimal = {
+      ...animal,
+      encounter: {
+        ...animal.encounter,
+        fear: newFear,
+        affection: newAffection,
+        interactionCount: animal.encounter.interactionCount + 1,
+        lastInteraction: Date.now(),
+        tamingProgress: newTamingProgress,
+        interactions: [...animal.encounter.interactions, interaction]
+      }
+    };
+
+    const result: TamingResult = {
       success,
       fearReduction,
       affectionGain,
@@ -375,6 +395,8 @@ export class EncounterAnimalManager {
       riskTriggered,
       bonusEffect
     };
+
+    return { animal: updatedAnimal, result };
   }
 
   /**
